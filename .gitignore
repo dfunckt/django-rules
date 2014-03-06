@@ -1,0 +1,10 @@
+*.egg-info
+*.pyc
+*~
+._*
+.coverage
+.DS_Store
+.Python
+__pycache__
+docs/_build
+pip-log.txt
