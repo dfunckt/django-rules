@@ -1,0 +1,7 @@
+include INSTALL
+include LICENSE
+include README.rst
+recursive-include tests *
+global-exclude *.pyc
+global-exclude .coverage
+global-exclude .DS_Store
