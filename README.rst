@@ -40,7 +40,7 @@ Using ``rules``
 
 ``rules`` is based on the idea that you maintain a dict-like object that maps
 string keys used as identifiers of some kind, to callables, called
-*predicates*. The dict-like object is actually an instance of ``RuleSet`` and
+*predicates*. This dict-like object is actually an instance of ``RuleSet`` and
 the predicates are instances of ``Predicate``.
 
 
@@ -76,9 +76,9 @@ Django, the equivalent signatures are:
 
 Predicates can do pretty much anything with the given arguments, but must
 always return ``True`` if the condition they check is true, ``False``
-otherwise. ``rules`` comes with several predefined predicates, mostly useful
-when dealing with authorization in Django, that you may read about later on in
-`API Reference`_.
+otherwise. ``rules`` comes with several predefined predicates that you may
+read about later on in `API Reference`_, that are mostly useful when dealing
+with `authorization in Django`_.
 
 
 Setting up rules
@@ -188,6 +188,8 @@ any context. There's actually no import of anything Django-related in the
 whole app (except in the ``rules.templatetags`` module). ``rules`` however can
 integrate tightly with Django to provide authorization.
 
+
+.. _authorization in Django:
 
 Using ``rules`` with Django
 ===========================
@@ -317,22 +319,22 @@ Before you can test for rules, these rules must be registered with a rule set,
 and for this to happen the modules containing your rule definitions must be
 imported.
 
-For more complex projects with several predicates and rules, it may not be
+For complex projects with several predicates and rules, it may not be
 practical to define all your predicates and rules inside one module. It might
 be best to split them among any sub-components of your project. In a Django
 context, these sub-components could be the apps for your project.
 
 On the other hand, because importing predicates from all over the place in
 order to define rules can lead to circular imports and broken hearts, it's
-best to split predicates and rules in different modules.
+best to further split predicates and rules in different modules.
 
 If using Django 1.7 and later, ``rules`` may optionally be configured to
 autodiscover ``rules.py`` modules in your apps and import them at startup. To
 have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting::
 
     INSTALLED_APPS = (
-        'rules.apps.AutodiscoverRulesConfig',
         # ...
+        'rules.apps.AutodiscoverRulesConfig',
     )
 
 
@@ -383,21 +385,20 @@ Instance methods
 ++++++++++++++++
 
 ``add_rule(name, predicate)``
-    Adds a predicate to the rule set, assigning it the given name. Raises
-    ``KeyError`` if another rule is already registered with the given name.
+    Adds a predicate to the rule set, assigning it to the given rule name.
+    Raises ``KeyError`` if another rule with that name already exists.
 
 ``remove_rule(name)``
     Remove the rule with the given name. Raises ``KeyError`` if a rule with
     that name does not exist.
 
 ``rule_exists(name)``
-    Returns ``True`` if a rule with the given name is registered, ``False``
-    otherwise.
+    Returns ``True`` if a rule with the given name exists, ``False`` otherwise.
 
 ``test_rule(name, obj=None, target=None)``
     Returns the result of calling ``predicate.test(obj, target)`` where
-    ``predicate`` is the predicate for the rule registered with the given
-    name. Returns ``False`` if a rule with the given name is not registered.
+    ``predicate`` is the predicate for the rule with the given name. Returns
+    ``False`` if a rule with the given name does not exist.
 
 Decorators
 ----------
@@ -459,31 +460,31 @@ Managing the shared rule set
 ++++++++++++++++++++++++++++
 
 ``add_rule(name, predicate)``
-    Adds a predicate to the shared rule set. See ``RuleSet.add_rule``.
+    Adds a rule to the shared rule set. See ``RuleSet.add_rule``.
 
 ``remove_rule(name)``
     Remove a rule from the shared rule set. See ``RuleSet.remove_rule``.
 
 ``rule_exists(name)``
-    Returns whether a rule is registered with the shared rule set. See
+    Returns whether a rule exists in the shared rule set. See
     ``RuleSet.rule_exists``.
 
 ``test_rule(name, obj=None, target=None)``
-    See ``RuleSet.test_rule``.
+    Tests the rule with the given name. See ``RuleSet.test_rule``.
 
 
 Managing the permissions rule set
 +++++++++++++++++++++++++++++++++
 
 ``add_perm(name, predicate)``
-    Adds a predicate to the permissions rule set. See ``RuleSet.add_rule``.
+    Adds a rule to the permissions rule set. See ``RuleSet.add_rule``.
 
 ``remove_perm(name)``
     Remove a rule from the permissions rule set. See ``RuleSet.remove_rule``.
 
 ``perm_exists(name)``
-    Returns whether a rule is registered with the permissions rule set. See
+    Returns whether a rule exists in the permissions rule set. See
     ``RuleSet.rule_exists``.
 
 ``has_perm(name, user=None, obj=None)``
-    See ``RuleSet.test_rule``.
+    Tests the rule with the given name. See ``RuleSet.test_rule``.
