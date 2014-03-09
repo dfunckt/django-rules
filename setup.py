@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 from os.path import dirname, join
 
-from rules import VERSION
-
-
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
+
+from rules import VERSION
 
 
 def get_version(version):
@@ -16,11 +15,6 @@ def get_version(version):
     """
     assert len(version) == 5
     assert version[3] in ('alpha', 'beta', 'rc', 'final')
-    
-    # Now build the two parts of the version number:
-    # main = X.Y[.Z]
-    # sub = .devN - for pre-alpha releases
-    #     | {a|b|c}N - for alpha, beta and rc releases
     
     parts = 2 if version[2] == 0 else 3
     main = '.'.join(str(x) for x in version[:parts])
@@ -39,10 +33,10 @@ with open(join(dirname(__file__), 'README.rst')) as f:
 
 setup(
     name='rules',
-    version=get_version(VERSION),
-    
     description='Awesome Django authorization, without the database',
+    version=get_version(VERSION),
     long_description=long_description,
+    
     url='http://github.com/dfunckt/django-rules',
     author='Akis Kesoglou',
     author_email='akiskesoglou@gmail.com',
@@ -64,7 +58,7 @@ setup(
     ],
     
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
