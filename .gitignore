@@ -6,5 +6,6 @@
 .DS_Store
 .Python
 __pycache__
+dist/
 docs/_build
 pip-log.txt
