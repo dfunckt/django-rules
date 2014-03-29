@@ -1,7 +1,7 @@
 django-rules
 ^^^^^^^^^^^^
 
-.. image:: https://travis-ci.org/dfunckt/django-rules.png?branch=master
+.. image:: https://travis-ci.org/dfunckt/django-rules.svg?branch=master
     :target: https://travis-ci.org/dfunckt/django-rules
 .. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.png
     :target: https://coveralls.io/r/dfunckt/django-rules
