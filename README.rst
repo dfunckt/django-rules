@@ -287,6 +287,67 @@ Then, in your template::
     {% endif %}
 
 
+Rules and permissions in the Admin
+----------------------------------
+
+If you've setup ``rules`` to be used with permissions in Django, you're almost
+set to also use ``rules`` to authorize any add/change/delete actions in the
+Admin. The Admin asks for *four* different permissions, depending on action:
+
+- ``<app_label>.add_<modelname>``
+- ``<app_label>.change_<modelname>``
+- ``<app_label>.delete_<modelname>``
+- ``<app_label>``
+
+The first three are obvious. The fourth is the required permission for an app
+to be displayed in the Admin's "dashboard". Here's some rules for our
+imaginary ``books`` app as an example::
+
+    >>> rules.add_perm('books', rules.always_allow)
+    >>> rules.add_perm('books.add_book', is_staff)
+    >>> rules.add_perm('books.change_book', is_staff)
+    >>> rules.add_perm('books.delete_book', is_staff)
+
+
+Object permissions
+++++++++++++++++++
+
+Django Admin does not support object-permissions, in the sense that it will
+never ask for permission to perform an action *on an object*, only whether a
+user is allowed to act on (*any*) instances of a model.
+
+If you'd like to tell Django whether a user has permissions on a specific
+object, you'd have to override the following methods of a model's
+``ModelAdmin``:
+
+- ``has_change_permission(user, obj=None)``
+- ``has_delete_permission(user, obj=None)``
+
+**Note:** There's also ``has_add_permission(user)`` but is not relevant here.
+
+``rules`` comes with a custom ``ModeAdmin`` subclass,
+``rules.contrib.admin.ObjectPermissionsModelAdmin``, that overrides these
+methods to pass on the edited model instance to the authorization backends,
+thus enabling permissions per object in the Admin::
+
+    # books/admin.py
+    from django.contrib import admin
+    from rules.contrib.admin import ObjectPermissionsModelAdmin
+    from .models import Book
+    
+    class BookAdmin(ObjectPermissionsModelAdmin):
+        pass
+    
+    admin.site.register(Book, BookAdmin)
+
+Now this allows you to specify permissions like this::
+
+    >>> rules.add_perm('books', rules.always_allow)
+    >>> rules.add_perm('books.add_book', has_author_profile)
+    >>> rules.add_perm('books.change_book', is_book_author_or_editor)
+    >>> rules.add_perm('books.delete_book', is_book_author)
+
+
 Custom rule sets
 ================
 

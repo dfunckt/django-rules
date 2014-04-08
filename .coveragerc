@@ -2,3 +2,4 @@
 omit =
     */python?.?/*
     */site-packages/nose/*
+    */rules/contrib/*

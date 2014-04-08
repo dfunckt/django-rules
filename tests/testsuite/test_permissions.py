@@ -35,5 +35,6 @@ def test_backend():
     add_perm('can_edit_book', always_true)
     assert 'can_edit_book' in permissions
     assert backend.has_perm(None, 'can_edit_book')
+    assert backend.has_module_perms(None, 'can_edit_book')
     remove_perm('can_edit_book')
     assert not perm_exists('can_edit_book')
