@@ -3,3 +3,5 @@ omit =
     */python?.?/*
     */site-packages/nose/*
     */rules/contrib/*
+    */rules/templatetags/*
+    */rules/apps.py
