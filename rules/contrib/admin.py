@@ -36,7 +36,7 @@ class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
         return super(ObjectPermissionsInlineModelAdminMixin, self).has_delete_permission(request, obj)
 
 
-class ObjectPermissionsModelAdmin(ObjectPermissionsModelAdminMixin, admin.ModeAdmin):
+class ObjectPermissionsModelAdmin(ObjectPermissionsModelAdminMixin, admin.ModelAdmin):
     pass
 
 
