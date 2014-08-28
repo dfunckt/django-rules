@@ -325,7 +325,7 @@ object, you'd have to override the following methods of a model's
 
 **Note:** There's also ``has_add_permission(user)`` but is not relevant here.
 
-``rules`` comes with a custom ``ModeAdmin`` subclass,
+``rules`` comes with a custom ``ModelAdmin`` subclass,
 ``rules.contrib.admin.ObjectPermissionsModelAdmin``, that overrides these
 methods to pass on the edited model instance to the authorization backends,
 thus enabling permissions per object in the Admin::
