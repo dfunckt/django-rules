@@ -48,6 +48,7 @@ setup(
     packages=[
         'rules',
         'rules.templatetags',
+        'rules.contrib',
     ],
     
     install_requires=[
