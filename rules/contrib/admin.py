@@ -12,7 +12,7 @@ class ObjectPermissionsModelAdminMixin(object):
         opts = self.opts
         codename = get_permission_codename('change', opts)
         return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
-    
+
     def has_delete_permission(self, request, obj=None):
         opts = self.opts
         codename = get_permission_codename('delete', opts)
@@ -29,14 +29,14 @@ class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
                     break
         codename = get_permission_codename('change', opts)
         return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
-    
+
     def has_delete_permission(self, request, obj=None):
         if self.opts.auto_created:
             return self.has_change_permission(request, obj)
         return super(ObjectPermissionsInlineModelAdminMixin, self).has_delete_permission(request, obj)
 
 
-class ObjectPermissionsModelAdmin(ObjectPermissionsModelAdminMixin, admin.ModeAdmin):
+class ObjectPermissionsModelAdmin(ObjectPermissionsModelAdminMixin, admin.ModelAdmin):
     pass
 
 
