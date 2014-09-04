@@ -2,8 +2,8 @@ from .predicates import predicate
 
 
 class RuleSet(dict):
-    def test_rule(self, name, obj=None, target=None):
-        return name in self and self[name].test(obj, target)
+    def test_rule(self, name, *args):
+        return name in self and self[name].test(*args)
 
     def rule_exists(self, name):
         return name in self
@@ -38,5 +38,5 @@ def rule_exists(name):
     return default_rules.rule_exists(name)
 
 
-def test_rule(name, obj=None, target=None):
-    return default_rules.test_rule(name, obj, target)
+def test_rule(name, *args):
+    return default_rules.test_rule(name, *args)

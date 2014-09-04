@@ -1,4 +1,6 @@
-from rules.predicates import Predicate, predicate
+from nose.tools import assert_raises
+
+from rules.predicates import Predicate, predicate, NOT_GIVEN
 
 
 def test_lambda_predicate():
@@ -221,3 +223,20 @@ def test_no_mask():
         assert a == 'a'
         assert b == 'b'
     p('a', b='b', c='c')
+
+
+def test_positional_args_not_given():
+    @predicate
+    def p(a, b):
+        if b is NOT_GIVEN:
+            assert a == 'a'
+        elif a is NOT_GIVEN:
+            raise TypeError
+        else:
+            assert a == b
+
+    p('a', NOT_GIVEN)
+    p('a', 'a')
+    assert not NOT_GIVEN
+    assert_raises(TypeError, p)
+    assert_raises(AssertionError, p, 'a', 'b')

@@ -2,6 +2,9 @@ import inspect
 from functools import update_wrapper
 
 
+NOT_GIVEN = set()  # object that have a False boolean evaluation
+
+
 class Predicate(object):
     def __init__(self, fn, name=None):
         # fn can be a callable with any of the following signatures:
@@ -39,22 +42,22 @@ class Predicate(object):
         return self.fn(*args, **kwargs)
 
     def __and__(self, other):
-        def AND(obj=None, target=None):
+        def AND(obj=NOT_GIVEN, target=NOT_GIVEN):
             return self.test(obj, target) and other.test(obj, target)
         return type(self)(AND, '(%s & %s)' % (self.name, other.name))
 
     def __or__(self, other):
-        def OR(obj=None, target=None):
+        def OR(obj=NOT_GIVEN, target=NOT_GIVEN):
             return self.test(obj, target) or other.test(obj, target)
         return type(self)(OR, '(%s | %s)' % (self.name, other.name))
 
     def __xor__(self, other):
-        def XOR(obj=None, target=None):
+        def XOR(obj=NOT_GIVEN, target=NOT_GIVEN):
             return self.test(obj, target) ^ other.test(obj, target)
         return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
 
     def __invert__(self):
-        def INVERT(obj=None, target=None):
+        def INVERT(obj=NOT_GIVEN, target=NOT_GIVEN):
             return not self.test(obj, target)
         if self.name.startswith('~'):
             name = self.name[1:]
@@ -62,16 +65,15 @@ class Predicate(object):
             name = '~' + self.name
         return type(self)(INVERT, name)
 
-    def test(self, obj=None, target=None):
+    def test(self, *args):
         # we setup a list of function args depending on the number of
         # arguments accepted by the underlying callback.
-        if self.num_args == 2:
-            args = (obj, target)
-        elif self.num_args == 1:
-            args = (obj,)
-        else:
-            args = ()
-        return bool(self.fn(*args))
+        passed_args = args[:self.num_args]
+        diff_length = self.num_args - len(passed_args)
+        if diff_length:
+            # fill in missing argument with NOT_GIVEN marker
+            passed_args = passed_args + (NOT_GIVEN,) * diff_length
+        return bool(self.fn(*passed_args))
 
 
 def predicate(fn=None, name=None):
