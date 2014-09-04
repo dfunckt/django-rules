@@ -8,10 +8,10 @@ class User(object):
     is_superuser = True
     is_staff = True
     is_active = True
-    
+
     _group_names_cache = set(['editors'])
     groups = ['editors']
-    
+
     def is_authenticated(self):
         return True
 
@@ -52,14 +52,14 @@ def test_is_group_member():
     p1 = is_group_member('somegroup')
     assert p1.name == 'is_group_member:somegroup'
     assert p1.num_args == 1
-    
+
     p2 = is_group_member('g1', 'g2', 'g3', 'g4')
     assert p2.name == 'is_group_member:g1,g2,g3,...'
-    
+
     p = is_group_member('editors')
     assert p(User())
     assert not p(SwappedUser())
-    
+
     p = is_group_member('editors', 'staff')
     assert not p(User())
     assert not p(SwappedUser())

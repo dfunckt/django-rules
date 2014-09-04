@@ -23,36 +23,36 @@ class Predicate(object):
         self.fn = fn
         self.num_args = num_args
         self.name = name or fn.__name__
-    
+
     def __repr__(self):
         return '<%s:%s object at %s>' % (
             type(self).__name__, str(self), hex(id(self)))
-    
+
     def __str__(self):
         return self.name
-    
+
     def __call__(self, *args, **kwargs):
         # this method is defined as variadic in order to not mask the
         # underlying callable's signature that was most likely decorated
         # as a predicate. internally we consistently call ``test`` that
         # provides a single interface to the callable.
         return self.fn(*args, **kwargs)
-    
+
     def __and__(self, other):
         def AND(obj=None, target=None):
             return self.test(obj, target) and other.test(obj, target)
         return type(self)(AND, '(%s & %s)' % (self.name, other.name))
-    
+
     def __or__(self, other):
         def OR(obj=None, target=None):
             return self.test(obj, target) or other.test(obj, target)
         return type(self)(OR, '(%s | %s)' % (self.name, other.name))
-    
+
     def __xor__(self, other):
         def XOR(obj=None, target=None):
             return self.test(obj, target) ^ other.test(obj, target)
         return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
-    
+
     def __invert__(self):
         def INVERT(obj=None, target=None):
             return not self.test(obj, target)
@@ -61,7 +61,7 @@ class Predicate(object):
         else:
             name = '~' + self.name
         return type(self)(INVERT, name)
-    
+
     def test(self, obj=None, target=None):
         # we setup a list of function args depending on the number of
         # arguments accepted by the underlying callback.
@@ -77,7 +77,7 @@ class Predicate(object):
 def predicate(fn=None, name=None):
     """
     Decorator that constructs a ``Predicate`` instance from any function::
-    
+
         >>> @predicate
         ... def is_book_author(user, book):
         ...     return user == book.author
@@ -86,14 +86,14 @@ def predicate(fn=None, name=None):
     if not name and not callable(fn):
         name = fn
         fn = None
-    
+
     def inner(fn):
         if isinstance(fn, Predicate):
             return fn
         p = Predicate(fn, name)
         update_wrapper(p, fn)
         return p
-    
+
     if fn:
         return inner(fn)
     else:
@@ -103,7 +103,7 @@ def predicate(fn=None, name=None):
 # Predefined predicates
 
 always_allow = predicate(lambda: True, name='always_allow')
-always_deny  = predicate(lambda: False, name='always_deny')
+always_deny = predicate(lambda: False, name='always_deny')
 
 
 @predicate
@@ -136,14 +136,14 @@ def is_active(user):
 
 def is_group_member(*groups):
     assert len(groups) > 0, 'You must provide at least one group name'
-    
+
     if len(groups) > 3:
         g = groups[:3] + ('...',)
     else:
         g = groups
-    
+
     name = 'is_group_member:%s' % ','.join(g)
-    
+
     @predicate(name)
     def fn(user):
         if not hasattr(user, 'groups'):
@@ -151,5 +151,5 @@ def is_group_member(*groups):
         if not hasattr(user, '_group_names_cache'):
             user._group_names_cache = set(user.groups.values_list('name', flat=True))
         return set(groups).issubset(user._group_names_cache)
-    
+
     return fn

@@ -31,7 +31,7 @@ def test_permissions_ruleset():
 def test_backend():
     backend = ObjectPermissionBackend()
     assert backend.authenticate('someuser', 'password') is None
-    
+
     add_perm('can_edit_book', always_true)
     assert 'can_edit_book' in permissions
     assert backend.has_perm(None, 'can_edit_book')
