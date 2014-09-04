@@ -4,18 +4,18 @@ from .predicates import predicate
 class RuleSet(dict):
     def test_rule(self, name, obj=None, target=None):
         return name in self and self[name].test(obj, target)
-    
+
     def rule_exists(self, name):
         return name in self
-    
+
     def add_rule(self, name, pred):
         if name in self:
             raise KeyError('A rule with name `%s` already exists' % name)
         self[name] = pred
-    
+
     def remove_rule(self, name):
         del self[name]
-    
+
     def __setitem__(self, name, pred):
         fn = predicate(pred)
         super(RuleSet, self).__setitem__(name, fn)

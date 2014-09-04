@@ -86,7 +86,7 @@ def test_decorator_custom_name():
         return True
     assert always_true.name == 'foo'
     assert always_true.num_args == 0
-    
+
     @predicate(name='bar')
     def always_false():
         return False
