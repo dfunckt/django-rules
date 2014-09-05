@@ -1,4 +1,6 @@
-from rules.predicates import Predicate, predicate
+from nose.tools import assert_raises
+
+from rules.predicates import Predicate, predicate, join_predicates
 
 
 def test_lambda_predicate():
@@ -174,12 +176,12 @@ def test_INV():
 def test_var_args():
     @predicate
     def p(*args, **kwargs):
-        assert len(args) == 0
-        assert len(kwargs) == 0
+        return True
+
     assert p.num_args == 0
-    p.test()
-    p.test('a')
-    p.test('a', 'b')
+    assert p.test()
+    assert p.test('a')
+    assert p.test('a', 'b')
 
 
 def test_no_args():
@@ -217,7 +219,83 @@ def test_no_mask():
     def p(a=None, b=None, *args, **kwargs):
         assert len(args) == 0
         assert len(kwargs) == 1
-        'c' in kwargs
+        assert 'c' in kwargs
         assert a == 'a'
         assert b == 'b'
     p('a', b='b', c='c')
+
+
+def test_predicate_election():
+    @predicate
+    def are_equal(a, b):
+        return a == b
+
+    @predicate
+    def is_equal(a):
+        return a == 'a'
+
+    join_predicates(are_equal, is_equal)
+    assert are_equal('a', 'a')
+    assert are_equal('a')
+    assert_raises(TypeError, are_equal)
+    assert is_equal('a', 'a')
+    assert is_equal('a')
+    assert_raises(TypeError, is_equal)
+
+
+def test_predicate_joining():
+    @predicate
+    def two(a, b):
+        pass
+
+    @predicate
+    def one(a):
+        pass
+
+    @predicate
+    def zero():
+        pass
+
+    @predicate
+    def two_varargs(a, b, *args):
+        pass
+
+    @predicate
+    def one_varargs(a, *args):
+        pass
+
+    @predicate
+    def zero_varargs(*args):
+        pass
+
+    @predicate
+    def two_varargs_keywords(a, b, *args, **kw):
+        pass
+
+    @predicate
+    def one_varargs_keywords(a, *args, **kw):
+        pass
+
+    @predicate
+    def zero_varargs_keywords(*args, **kw):
+        pass
+
+    join_predicates(two_varargs,
+                    two,
+                    zero_varargs_keywords,
+                    one,
+                    zero_varargs,
+                    one_varargs,
+                    one_varargs_keywords,
+                    zero,
+                    two_varargs_keywords)
+    results = list(p for p in two_varargs)
+    assert (results == [two,
+                        two_varargs,
+                        two_varargs_keywords,
+                        one,
+                        one_varargs,
+                        one_varargs_keywords,
+                        zero,
+                        zero_varargs,
+                        zero_varargs_keywords]), results
