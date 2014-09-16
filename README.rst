@@ -51,6 +51,7 @@ Let's ignore rule sets for a moment and go ahead and define a predicate. The
 easiest way is with the ``@predicate`` decorator:
 
 .. code:: pycon
+
     >>> @rules.predicate
     >>> def is_book_author(user, book):
     ...     return book.author == user
@@ -102,12 +103,14 @@ So, let's define our first couple of rules, adding them to the shared rule
 set. We can use the ``is_book_author`` predicate we defined earlier:
     
 .. code:: pycon
+
     >>> rules.add_rule('can_edit_book', is_book_author)
     >>> rules.add_rule('can_delete_book', is_book_author)
 
 Assuming we've got some data, we can now test our rules:
 
 .. code:: pycon
+
     >>> from django.contrib.auth.models import User
     >>> from books.models import Book
     >>> guidetodjango = Book.objects.get(isbn='978-1-4302-1936-1')
@@ -150,6 +153,7 @@ predicate, that would return ``True`` if the given user is a member of the
 will come in handy:
 
 .. code:: pycon
+
     >>> is_editor = rules.is_group_member('editors')
     >>> is_editor
     <Predicate:is_group_member:editors object at 0x10eee1350>
@@ -158,6 +162,7 @@ We could combine it with the ``is_book_author`` predicate to create a new one
 that checks for either condition:
 
 .. code:: pycon
+
     >>> is_book_author_or_editor = is_book_author | is_editor
     >>> is_book_author_or_editor
     <Predicate:(is_book_author | is_group_member:editors) object at 0x10eee1390>
@@ -165,6 +170,7 @@ that checks for either condition:
 We can now update our ``can_edit_book`` rule:
 
 .. code:: pycon
+
     >>> rules.add_rule('can_edit_book', is_book_author_or_editor)
     Traceback (most recent call last):
         ...
@@ -179,6 +185,7 @@ We can now update our ``can_edit_book`` rule:
 Let's see what happens with another user:
 
 .. code:: pycon
+
     >>> martin = User.objects.get(username='martin')
     >>> list(martin.groups.values_list('name', flat=True))
     ['editors']
@@ -223,6 +230,7 @@ and we like to adhere to that. Let's add rules for the ``books.change_book``
 and ``books.delete_book`` permissions:
 
 .. code:: pycon
+
     >>> rules.add_perm('books.change_book', is_book_author | is_editor)
     >>> rules.add_perm('books.delete_book', is_book_author)
 
@@ -239,6 +247,7 @@ Let's go ahead and check whether ``adrian`` has change permission to the
 ``guidetodjango`` book:
 
 .. code:: pycon
+
     >>> adrian.has_perm('books.change_book', guidetodjango)
     False
 
@@ -252,6 +261,7 @@ looking into the permissions-specific rule set.
 Let's add the ``rules`` authorization backend in settings:
 
 .. code:: pycon
+
     AUTHENTICATION_BACKENDS = (
         'rules.permissions.ObjectPermissionBackend',
         'django.contrib.auth.backends.ModelBackend',
@@ -260,6 +270,7 @@ Let's add the ``rules`` authorization backend in settings:
 Now, checking again gives ``adrian`` the required permissions:
 
 .. code:: pycon
+
     >>> adrian.has_perm('books.change_book', guidetodjango)
     True
     >>> adrian.has_perm('books.delete_book', guidetodjango)
@@ -279,6 +290,7 @@ permissions in templates.
 Add ``rules`` to your ``INSTALLED_APPS``:
 
 .. code:: pycon
+
     INSTALLED_APPS = (
         # ...
         'rules',
@@ -317,6 +329,7 @@ to be displayed in the Admin's "dashboard". Here's some rules for our
 imaginary ``books`` app as an example:
 
 .. code:: pycon
+
     >>> rules.add_perm('books', rules.always_allow)
     >>> rules.add_perm('books.add_book', is_staff)
     >>> rules.add_perm('books.change_book', is_staff)
@@ -345,6 +358,7 @@ methods to pass on the edited model instance to the authorization backends,
 thus enabling permissions per object in the Admin:
 
 .. code:: pycon
+
     # books/admin.py
     from django.contrib import admin
     from rules.contrib.admin import ObjectPermissionsModelAdmin
@@ -358,6 +372,7 @@ thus enabling permissions per object in the Admin:
 Now this allows you to specify permissions like this:
 
 .. code:: pycon
+
     >>> rules.add_perm('books', rules.always_allow)
     >>> rules.add_perm('books.add_book', has_author_profile)
     >>> rules.add_perm('books.change_book', is_book_author_or_editor)
@@ -370,11 +385,13 @@ Custom rule sets
 You may create as many rule sets as you need:
 
 .. code:: pycon
+
     >>> features = rules.RuleSet()
 
 And manipulate them by adding, removing, querying and testing rules:
 
 .. code:: pycon
+
     >>> features.rule_exists('has_super_feature')
     False
     >>> is_special_user = rules.is_group_member('special')
@@ -412,6 +429,7 @@ autodiscover ``rules.py`` modules in your apps and import them at startup. To
 have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
 
 .. code:: pycon
+
     INSTALLED_APPS = (
         # ...
         'rules.apps.AutodiscoverRulesConfig',
@@ -430,6 +448,7 @@ Class ``rules.Predicate``
 You create ``Predicate`` instances by passing in a callable:
 
 .. code:: pycon
+
     >>> def is_book_author(user, book):
     ...     return book.author == user
     ...
@@ -441,6 +460,7 @@ You may optionally provide a different name for the predicate that is used
 when inspecting it:
 
 .. code:: pycon
+
     >>> pred = Predicate(is_book_author, name='another_name')
     >>> pred
     <Predicate:another_name object at 0x10eeaa490>
@@ -489,6 +509,7 @@ Decorators
     Decorator that creates a predicate out of any callable:
     
     .. code:: pycon
+    
         >>> @predicate
         ... def is_book_author(user, book):
         ...     return book.author == user
@@ -499,6 +520,7 @@ Decorators
     Customising the predicate name:
     
     .. code:: pycon
+    
         >>> @predicate(name='another_name')
         ... def is_book_author(user, book):
         ...     return book.author == user
