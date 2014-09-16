@@ -1,5 +1,6 @@
-from rules.predicates import (always_allow, always_deny, is_authenticated,
-                              is_superuser, is_staff, is_active, is_group_member)
+from rules.predicates import (always_true, always_false, always_allow,
+                              always_deny, is_authenticated, is_superuser,
+                              is_staff, is_active, is_group_member)
 
 
 # mock models
@@ -18,6 +19,14 @@ class User(object):
 
 class SwappedUser(object):
     pass
+
+
+def test_always_true():
+    assert always_true()
+
+
+def test_always_false():
+    assert not always_false()
 
 
 def test_always_allow():

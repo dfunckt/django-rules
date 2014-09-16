@@ -535,10 +535,10 @@ Decorators
 Predefined predicates
 ---------------------
 
-``always_allow()``
+``always_allow()``, ``always_true()``
     Always returns ``True``.
 
-``always_deny()``
+``always_deny()``, ``always_false()``
     Always returns ``False``.
 
 ``is_authenticated(user)``

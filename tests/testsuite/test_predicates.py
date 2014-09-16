@@ -1,4 +1,4 @@
-from rules.predicates import Predicate, predicate
+from rules.predicates import Predicate, predicate, always_true, always_false
 
 
 def test_lambda_predicate():
@@ -8,22 +8,22 @@ def test_lambda_predicate():
 
 
 def test_lambda_predicate_custom_name():
-    p = Predicate(lambda: True, name='always_true')
-    assert p.name == 'always_true'
+    p = Predicate(lambda: True, name='mypred')
+    assert p.name == 'mypred'
 
 
 def test_function_predicate():
-    def always_true():
+    def mypred():
         return True
-    p = Predicate(always_true)
-    assert p.name == 'always_true'
+    p = Predicate(mypred)
+    assert p.name == 'mypred'
     assert p.num_args == 0
 
 
 def test_function_predicate_custom_name():
-    def always_true():
+    def mypred():
         return True
-    p = Predicate(always_true, name='foo')
+    p = Predicate(mypred, name='foo')
     assert p.name == 'foo'
     assert p.num_args == 0
 
@@ -49,66 +49,56 @@ def test_class_predicate_custom_name():
 
 
 def test_predicate_predicate():
-    def always_true():
+    def mypred():
         return True
-    p = Predicate(Predicate(always_true))
-    assert p.name == 'always_true'
+    p = Predicate(Predicate(mypred))
+    assert p.name == 'mypred'
     assert p.num_args == 0
 
 
 def test_predicate_predicate_custom_name():
-    def always_true():
+    def mypred():
         return True
-    p = Predicate(Predicate(always_true, name='foo'))
+    p = Predicate(Predicate(mypred, name='foo'))
     assert p.name == 'foo'
     assert p.num_args == 0
 
 
 def test_decorator():
     @predicate
-    def always_true(arg1, arg2):
+    def mypred(arg1, arg2):
         return True
-    assert always_true.name == 'always_true'
-    assert always_true.num_args == 2
+    assert mypred.name == 'mypred'
+    assert mypred.num_args == 2
 
 
 def test_decorator_noargs():
     @predicate()
-    def always_true(arg1, arg2):
+    def mypred(arg1, arg2):
         return True
-    assert always_true.name == 'always_true'
-    assert always_true.num_args == 2
+    assert mypred.name == 'mypred'
+    assert mypred.num_args == 2
 
 
 def test_decorator_custom_name():
     @predicate('foo')
-    def always_true():
+    def mypred():
         return True
-    assert always_true.name == 'foo'
-    assert always_true.num_args == 0
+    assert mypred.name == 'foo'
+    assert mypred.num_args == 0
 
     @predicate(name='bar')
-    def always_false():
+    def myotherpred():
         return False
-    assert always_false.name == 'bar'
-    assert always_false.num_args == 0
+    assert myotherpred.name == 'bar'
+    assert myotherpred.num_args == 0
 
 
 def test_repr():
     @predicate
-    def always_true(arg1, arg2):
+    def mypred(arg1, arg2):
         return True
-    assert repr(always_true).startswith('<Predicate:always_true object at 0x')
-
-
-@predicate
-def always_true():
-    return True
-
-
-@predicate
-def always_false():
-    return False
+    assert repr(mypred).startswith('<Predicate:mypred object at 0x')
 
 
 def test_AND():

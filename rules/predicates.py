@@ -102,6 +102,9 @@ def predicate(fn=None, name=None):
 
 # Predefined predicates
 
+always_true = predicate(lambda: True, name='always_true')
+always_false = predicate(lambda: False, name='always_false')
+
 always_allow = predicate(lambda: True, name='always_allow')
 always_deny = predicate(lambda: False, name='always_deny')
 
