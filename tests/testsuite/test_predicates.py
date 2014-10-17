@@ -2,66 +2,75 @@ from rules.predicates import Predicate, predicate, always_true, always_false
 
 
 def test_lambda_predicate():
-    p = Predicate(lambda: True)
+    p = Predicate(lambda x: x == 'a')
     assert p.name == '<lambda>'
-    assert p.num_args == 0
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_lambda_predicate_custom_name():
-    p = Predicate(lambda: True, name='mypred')
+    p = Predicate(lambda x: x == 'a', name='mypred')
     assert p.name == 'mypred'
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_function_predicate():
-    def mypred():
-        return True
+    def mypred(x):
+        return x == 'a'
     p = Predicate(mypred)
     assert p.name == 'mypred'
-    assert p.num_args == 0
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_function_predicate_custom_name():
-    def mypred():
-        return True
+    def mypred(x):
+        return x == 'a'
     p = Predicate(mypred, name='foo')
     assert p.name == 'foo'
-    assert p.num_args == 0
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_class_predicate():
     class callableclass(object):
         def __call__(self, arg1, arg2):
-            return True
+            return arg1 == arg2
     fn = callableclass()
     p = Predicate(fn)
     assert p.name == 'callableclass'
     assert p.num_args == 2
+    assert p('a', 'a')
 
 
 def test_class_predicate_custom_name():
     class callableclass(object):
         def __call__(self, arg):
-            return True
+            return arg == 'a'
     fn = callableclass()
     p = Predicate(fn, name='bar')
     assert p.name == 'bar'
     assert p.num_args == 1
+    assert p('a')
 
 
 def test_predicate_predicate():
-    def mypred():
-        return True
+    def mypred(x):
+        return x == 'a'
     p = Predicate(Predicate(mypred))
     assert p.name == 'mypred'
-    assert p.num_args == 0
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_predicate_predicate_custom_name():
-    def mypred():
-        return True
+    def mypred(x):
+        return x == 'a'
     p = Predicate(Predicate(mypred, name='foo'))
     assert p.name == 'foo'
-    assert p.num_args == 0
+    assert p.num_args == 1
+    assert p('a')
 
 
 def test_decorator():
