@@ -1,5 +1,32 @@
 import inspect
+import threading
 from functools import partial, update_wrapper
+
+
+class Context(dict):
+    def __init__(self, args):
+        super(Context, self).__init__()
+        self.args = args
+
+
+class localcontext(threading.local):
+    def __init__(self):
+        self.stack = []
+
+
+_context = localcontext()
+
+
+class NoValueSentinel(object):
+    def __bool__(self):
+        return False
+
+    __nonzero__ = __bool__  # python 2
+
+
+NO_VALUE = NoValueSentinel()
+
+del NoValueSentinel
 
 
 class Predicate(object):
@@ -10,25 +37,32 @@ class Predicate(object):
         #   - fn()
         assert callable(fn), 'The given predicate is not callable.'
         if isinstance(fn, Predicate):
-            fn, num_args, name = fn.fn, fn.num_args, name or fn.name
+            fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
         elif isinstance(fn, partial):
-            num_args = len(inspect.getargspec(fn.func).args) - len(fn.args)
+            argspec = inspect.getargspec(fn.func)
+            var_args = argspec.varargs is not None
+            num_args = len(argspec.args) - len(fn.args)
             if inspect.ismethod(fn.func):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
         elif inspect.ismethod(fn):
             num_args = len(inspect.getargspec(fn).args) - 1  # skip `self`
         elif inspect.isfunction(fn):
-            num_args = len(inspect.getargspec(fn).args)
+            argspec = inspect.getargspec(fn)
+            var_args = argspec.varargs is not None
+            num_args = len(argspec.args)
         elif isinstance(fn, object):
             callfn = getattr(fn, '__call__')
-            num_args = len(inspect.getargspec(callfn).args) - 1  # skip `self`
+            argspec = inspect.getargspec(callfn)
+            var_args = argspec.varargs is not None
+            num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__
         else:
             raise TypeError('Incompatible predicate.')
         assert num_args <= 2, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
+        self.var_args = var_args
         self.name = name or fn.__name__
 
     def __repr__(self):
@@ -41,44 +75,93 @@ class Predicate(object):
     def __call__(self, *args, **kwargs):
         # this method is defined as variadic in order to not mask the
         # underlying callable's signature that was most likely decorated
-        # as a predicate. internally we consistently call ``test`` that
+        # as a predicate. internally we consistently call ``_apply`` that
         # provides a single interface to the callable.
         return self.fn(*args, **kwargs)
 
+    @property
+    def context(self):
+        """
+        The currently active invocation context. A new context is created as a
+        result of invoking ``test()`` and is only valid for the duration of
+        the invocation.
+
+        Can be used by predicates to store arbitrary data, eg. for caching
+        computed values, setting flags, etc., that can be used by predicates
+        later on in the chain.
+
+        Inside a predicate function it can be used like so::
+
+            >>> @predicate
+            ... def mypred(a, b):
+            ...     value = compute_expensive_value(a)
+            ...     mypred.context['value'] = value
+            ...     return True
+            ...
+
+        Other predicates can later use stored values::
+
+            >>> @predicate
+            ... def myotherpred(a, b):
+            ...     value = myotherpred.context.get('value')
+            ...     if value is not None:
+            ...         return do_something_with_value(value)
+            ...     else:
+            ...         return do_something_without_value()
+            ...
+
+        """
+        try:
+            return _context.stack[-1]
+        except IndexError:
+            return None
+
+    def test(self, obj=NO_VALUE, target=NO_VALUE):
+        """
+        The canonical method to invoke predicates.
+        """
+        args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
+        _context.stack.append(Context(args))
+        try:
+            return self._apply(*args)
+        finally:
+            _context.stack.pop()
+
     def __and__(self, other):
-        def AND(obj=None, target=None):
-            return self.test(obj, target) and other.test(obj, target)
+        def AND(*args):
+            return self._apply(*args) and other._apply(*args)
         return type(self)(AND, '(%s & %s)' % (self.name, other.name))
 
     def __or__(self, other):
-        def OR(obj=None, target=None):
-            return self.test(obj, target) or other.test(obj, target)
+        def OR(*args):
+            return self._apply(*args) or other._apply(*args)
         return type(self)(OR, '(%s | %s)' % (self.name, other.name))
 
     def __xor__(self, other):
-        def XOR(obj=None, target=None):
-            return self.test(obj, target) ^ other.test(obj, target)
+        def XOR(*args):
+            return self._apply(*args) ^ other._apply(*args)
         return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
 
     def __invert__(self):
-        def INVERT(obj=None, target=None):
-            return not self.test(obj, target)
+        def INVERT(*args):
+            return not self._apply(*args)
         if self.name.startswith('~'):
             name = self.name[1:]
         else:
             name = '~' + self.name
         return type(self)(INVERT, name)
 
-    def test(self, obj=None, target=None):
-        # we setup a list of function args depending on the number of
-        # arguments accepted by the underlying callback.
-        if self.num_args == 2:
-            args = (obj, target)
-        elif self.num_args == 1:
-            args = (obj,)
+    def _apply(self, *args):
+        # Internal method that is used to invoke the predicate with the
+        # proper number of positional arguments, inside the current
+        # invocation context.
+        if self.var_args:
+            callargs = args
+        elif self.num_args > len(args):
+            callargs = args + (None,) * (self.num_args - len(args))
         else:
-            args = ()
-        return bool(self.fn(*args))
+            callargs = args[:self.num_args]
+        return bool(self.fn(*callargs))
 
 
 def predicate(fn=None, name=None):

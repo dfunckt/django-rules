@@ -1,6 +1,6 @@
 import functools
 
-from rules.predicates import Predicate, predicate, always_true, always_false
+from rules.predicates import Predicate, predicate, always_true, always_false, NO_VALUE
 
 
 def test_lambda_predicate():
@@ -210,10 +210,9 @@ def test_INV():
 def test_var_args():
     @predicate
     def p(*args, **kwargs):
-        assert len(args) == 0
+        assert len(args) > 0
         assert len(kwargs) == 0
     assert p.num_args == 0
-    p.test()
     p.test('a')
     p.test('a', 'b')
 
@@ -257,3 +256,66 @@ def test_no_mask():
         assert a == 'a'
         assert b == 'b'
     p('a', b='b', c='c')
+
+
+def test_no_value_marker():
+    @predicate
+    def p(a, b=None):
+        assert a == 'a'
+        assert b is None
+
+    assert not NO_VALUE
+    p.test('a')
+    p.test('a', NO_VALUE)
+
+
+def test_invocation_context():
+    @predicate
+    def p1():
+        assert id(p1.context) == id(p2.context)
+        assert p1.context.args == ('a',)
+        return True
+
+    @predicate
+    def p2():
+        assert id(p1.context) == id(p2.context)
+        assert p2.context.args == ('a',)
+        return True
+
+    p = p1 & p2
+    assert p.test('a')
+    assert p.context is None
+
+
+def test_invocation_context_nested():
+    @predicate
+    def p1():
+        assert p1.context.args == ('b1',)
+        return True
+
+    @predicate
+    def p2():
+        assert p2.context.args == ('b2',)
+        return True
+
+    @predicate
+    def p():
+        assert p1.context.args == ('a',)
+        return p1.test('b1') & p2.test('b2')
+
+    assert p.test('a')
+    assert p.context is None
+
+
+def test_invocation_context_storage():
+    @predicate
+    def p1(a):
+        p1.context['p1.a'] = a
+        return True
+
+    @predicate
+    def p2(a):
+        return p2.context['p1.a'] == a
+
+    p = p1 & p2
+    assert p.test('a')
