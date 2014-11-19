@@ -1,5 +1,5 @@
 import inspect
-from functools import update_wrapper
+from functools import partial, update_wrapper
 
 
 class Predicate(object):
@@ -11,6 +11,9 @@ class Predicate(object):
         assert callable(fn), 'The given predicate is not callable.'
         if isinstance(fn, Predicate):
             fn, num_args, name = fn.fn, fn.num_args, name or fn.name
+        elif isinstance(fn, partial):
+            num_args = len(inspect.getargspec(fn.func).args) - len(fn.args)
+            name = fn.func.__name__
         elif inspect.isfunction(fn):
             num_args = len(inspect.getargspec(fn).args)
         elif isinstance(fn, object):
@@ -91,7 +94,10 @@ def predicate(fn=None, name=None):
         if isinstance(fn, Predicate):
             return fn
         p = Predicate(fn, name)
-        update_wrapper(p, fn)
+        if isinstance(fn, partial):
+            update_wrapper(p, fn.func)
+        else:
+            update_wrapper(p, fn)
         return p
 
     if fn:

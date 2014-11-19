@@ -1,3 +1,5 @@
+import functools
+
 from rules.predicates import Predicate, predicate, always_true, always_false
 
 
@@ -220,3 +222,11 @@ def test_no_mask():
         assert a == 'a'
         assert b == 'b'
     p('a', b='b', c='c')
+
+
+def test_predicate_can_be_partial():
+    def three_param(one, two, three):
+        return one < two < three
+
+    p = predicate(functools.partial(three_param, 1))
+    assert p(2, 3)
