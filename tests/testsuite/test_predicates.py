@@ -1,3 +1,5 @@
+import functools
+
 from rules.predicates import Predicate, predicate, always_true, always_false
 
 
@@ -31,6 +33,19 @@ def test_function_predicate_custom_name():
     assert p.name == 'foo'
     assert p.num_args == 1
     assert p('a')
+
+
+def test_partial_function_predicate():
+    def mypred(one, two, three):
+        return one < two < three
+    p = Predicate(functools.partial(mypred, 1))
+    assert p.name == 'mypred'
+    assert p.num_args == 2  # 3 - 1 partial
+    assert p(2, 3)
+    p = Predicate(functools.partial(mypred, 1, 2))
+    assert p.name == 'mypred'
+    assert p.num_args == 1  # 3 - 2 partial
+    assert p(3)
 
 
 def test_class_predicate():
