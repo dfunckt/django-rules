@@ -434,7 +434,7 @@ have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
 .. code:: python
 
     INSTALLED_APPS = (
-        # ...
+        # replace 'rules' with:
         'rules.apps.AutodiscoverRulesConfig',
     )
 
