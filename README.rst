@@ -438,6 +438,11 @@ have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
         'rules.apps.AutodiscoverRulesConfig',
     )
 
+.. note::
+
+    On Python 2, you must also add ``from __future__ import absolute_import``
+    to the top of your ``rules.py`` file.
+
 
 API Reference
 =============
