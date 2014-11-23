@@ -438,10 +438,13 @@ have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
         'rules.apps.AutodiscoverRulesConfig',
     )
 
-.. note::
+**Note:** On Python 2, you must also add the following to the top of your
+``rules.py`` file, or you'll get import errors trying to import
+``django-rules`` itself:
 
-    On Python 2, you must also add ``from __future__ import absolute_import``
-    to the top of your ``rules.py`` file.
+.. code:: python
+
+    from __future__ import absolute_import
 
 
 API Reference
