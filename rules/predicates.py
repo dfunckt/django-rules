@@ -30,7 +30,7 @@ del NoValueSentinel
 
 
 class Predicate(object):
-    def __init__(self, fn, name=None):
+    def __init__(self, fn, name=None, bind=False):
         # fn can be a callable with any of the following signatures:
         #   - fn(obj=None, target=None)
         #   - fn(obj=None)
@@ -59,11 +59,14 @@ class Predicate(object):
             name = name or type(fn).__name__
         else:
             raise TypeError('Incompatible predicate.')
+        if bind:
+            num_args -= 1
         assert num_args <= 2, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
         self.var_args = var_args
         self.name = name or fn.__name__
+        self.bind = bind
 
     def __repr__(self):
         return '<%s:%s object at %s>' % (
@@ -77,6 +80,8 @@ class Predicate(object):
         # underlying callable's signature that was most likely decorated
         # as a predicate. internally we consistently call ``_apply`` that
         # provides a single interface to the callable.
+        if self.bind:
+            return self.fn(self, *args, **kwargs)
         return self.fn(*args, **kwargs)
 
     @property
@@ -161,10 +166,12 @@ class Predicate(object):
             callargs = args + (None,) * (self.num_args - len(args))
         else:
             callargs = args[:self.num_args]
+        if self.bind:
+            return bool(self.fn(self, *callargs))
         return bool(self.fn(*callargs))
 
 
-def predicate(fn=None, name=None):
+def predicate(fn=None, name=None, bind=False):
     """
     Decorator that constructs a ``Predicate`` instance from any function::
 
@@ -172,6 +179,11 @@ def predicate(fn=None, name=None):
         ... def is_book_author(user, book):
         ...     return user == book.author
         ...
+
+        >>> @predicate(bind=True)
+        ... def is_book_author(self, user, book):
+        ...     if self.context.args:
+        ...         return user == book.author
     """
     if not name and not callable(fn):
         name = fn
@@ -180,7 +192,7 @@ def predicate(fn=None, name=None):
     def inner(fn):
         if isinstance(fn, Predicate):
             return fn
-        p = Predicate(fn, name)
+        p = Predicate(fn, name, bind=bind)
         if isinstance(fn, partial):
             update_wrapper(p, fn.func)
         else:

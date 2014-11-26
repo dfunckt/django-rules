@@ -319,3 +319,11 @@ def test_invocation_context_storage():
 
     p = p1 & p2
     assert p.test('a')
+
+
+def test_binding_predicate():
+    @predicate(bind=True)
+    def is_bound(self):
+        return self is is_bound
+
+    assert is_bound()
