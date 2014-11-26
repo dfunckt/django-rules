@@ -1,6 +1,12 @@
 import functools
 
-from rules.predicates import Predicate, predicate, always_true, always_false, NO_VALUE
+from rules.predicates import (
+    NO_VALUE,
+    Predicate,
+    always_false,
+    always_true,
+    predicate,
+)
 
 
 def test_lambda_predicate():
@@ -108,6 +114,22 @@ def test_predicate_predicate_custom_name():
     assert p.name == 'foo'
     assert p.num_args == 1
     assert p('a')
+
+
+def test_predicate_bind():
+    @predicate(bind=True)
+    def is_bound(self):
+        return self is is_bound
+
+    assert is_bound()
+
+    p = None
+
+    def mypred(self):
+        return self is p
+
+    p = Predicate(mypred, bind=True)
+    assert p()
 
 
 def test_decorator():
@@ -269,6 +291,29 @@ def test_no_value_marker():
     p.test('a', NO_VALUE)
 
 
+def test_skip_predicate():
+    @predicate(bind=True)
+    def requires_two_args(self, a, b):
+        if len(self.context.args) < 2:
+            self.skip()
+        return a == b
+
+    @predicate
+    def requires_one_arg(a):
+        return a
+
+    assert (requires_two_args & requires_one_arg).test(True, True)
+    assert not (requires_two_args & requires_one_arg).test(True, False)
+
+    # because requires_two_args is called with only one argument
+    # its result is not taken into account, only the result of the
+    # other predicates matters.
+    assert (requires_two_args & requires_one_arg).test(True)
+    assert not (requires_two_args & requires_one_arg).test(False)
+    assert (~requires_two_args & requires_one_arg).test(True)
+    assert not (~requires_two_args & requires_one_arg).test(False)
+
+
 def test_invocation_context():
     @predicate
     def p1():
@@ -319,11 +364,3 @@ def test_invocation_context_storage():
 
     p = p1 & p2
     assert p.test('a')
-
-
-def test_binding_predicate():
-    @predicate(bind=True)
-    def is_bound(self):
-        return self is is_bound
-
-    assert is_bound()

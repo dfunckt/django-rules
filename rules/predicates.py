@@ -3,6 +3,13 @@ import threading
 from functools import partial, update_wrapper
 
 
+class SkipPredicate(Exception):
+    """
+    Use to reject usage of a predicate.
+    """
+    pass
+
+
 class Context(dict):
     def __init__(self, args):
         super(Context, self).__init__()
@@ -46,7 +53,9 @@ class Predicate(object):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
         elif inspect.ismethod(fn):
-            num_args = len(inspect.getargspec(fn).args) - 1  # skip `self`
+            argspec = inspect.getargspec(fn)
+            var_args = argspec.varargs is not None
+            num_args = len(argspec.args) - 1  # skip `self`
         elif inspect.isfunction(fn):
             argspec = inspect.getargspec(fn)
             var_args = argspec.varargs is not None
@@ -121,6 +130,13 @@ class Predicate(object):
         except IndexError:
             return None
 
+    def skip(self):
+        """
+        Use this method in a predicate body to signal that it should be
+        ignored for the current invocation.
+        """
+        raise SkipPredicate()
+
     def test(self, obj=NO_VALUE, target=NO_VALUE):
         """
         The canonical method to invoke predicates.
@@ -128,35 +144,35 @@ class Predicate(object):
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
         try:
-            return self._apply(*args)
+            return self._apply(True, *args)
         finally:
             _context.stack.pop()
 
     def __and__(self, other):
         def AND(*args):
-            return self._apply(*args) and other._apply(*args)
+            return self._apply(True, *args) and other._apply(True, *args)
         return type(self)(AND, '(%s & %s)' % (self.name, other.name))
 
     def __or__(self, other):
         def OR(*args):
-            return self._apply(*args) or other._apply(*args)
+            return self._apply(True, *args) or other._apply(True, *args)
         return type(self)(OR, '(%s | %s)' % (self.name, other.name))
 
     def __xor__(self, other):
         def XOR(*args):
-            return self._apply(*args) ^ other._apply(*args)
+            return self._apply(True, *args) ^ other._apply(True, *args)
         return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
 
     def __invert__(self):
         def INVERT(*args):
-            return not self._apply(*args)
+            return not self._apply(False, *args)
         if self.name.startswith('~'):
             name = self.name[1:]
         else:
             name = '~' + self.name
         return type(self)(INVERT, name)
 
-    def _apply(self, *args):
+    def _apply(self, default, *args):
         # Internal method that is used to invoke the predicate with the
         # proper number of positional arguments, inside the current
         # invocation context.
@@ -167,11 +183,14 @@ class Predicate(object):
         else:
             callargs = args[:self.num_args]
         if self.bind:
-            return bool(self.fn(self, *callargs))
-        return bool(self.fn(*callargs))
+            callargs = (self,) + callargs
+        try:
+            return bool(self.fn(*callargs))
+        except SkipPredicate:
+            return default
 
 
-def predicate(fn=None, name=None, bind=False):
+def predicate(fn=None, name=None, **options):
     """
     Decorator that constructs a ``Predicate`` instance from any function::
 
@@ -192,7 +211,7 @@ def predicate(fn=None, name=None, bind=False):
     def inner(fn):
         if isinstance(fn, Predicate):
             return fn
-        p = Predicate(fn, name, bind=bind)
+        p = Predicate(fn, name, **options)
         if isinstance(fn, partial):
             update_wrapper(p, fn.func)
         else:
