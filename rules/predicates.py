@@ -13,7 +13,11 @@ class Predicate(object):
             fn, num_args, name = fn.fn, fn.num_args, name or fn.name
         elif isinstance(fn, partial):
             num_args = len(inspect.getargspec(fn.func).args) - len(fn.args)
+            if inspect.ismethod(fn.func):
+                num_args -= 1  # skip `self`
             name = fn.func.__name__
+        elif inspect.ismethod(fn):
+            num_args = len(inspect.getargspec(fn).args) - 1  # skip `self`
         elif inspect.isfunction(fn):
             num_args = len(inspect.getargspec(fn).args)
         elif isinstance(fn, object):

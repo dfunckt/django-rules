@@ -48,6 +48,28 @@ def test_partial_function_predicate():
     assert p(3)
 
 
+def test_method_predicate():
+    class SomeClass(object):
+        def some_method(self, arg1, arg2):
+            return arg1 == arg2
+    obj = SomeClass()
+    p = Predicate(obj.some_method)
+    assert p.name == 'some_method'
+    assert p.num_args == 2
+    assert p(2, 2)
+
+
+def test_partial_method_predicate():
+    class SomeClass(object):
+        def some_method(self, arg1, arg2):
+            return arg1 == arg2
+    obj = SomeClass()
+    p = Predicate(functools.partial(obj.some_method, 2))
+    assert p.name == 'some_method'
+    assert p.num_args == 1
+    assert p(2)
+
+
 def test_class_predicate():
     class callableclass(object):
         def __call__(self, arg1, arg2):
