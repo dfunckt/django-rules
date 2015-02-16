@@ -496,13 +496,12 @@ sugar. As a matter of fact, the following two are equivalent:
 Skipping predicates
 -------------------
 
-You may skip evaluation of a predicate by calling the ``skip()`` method of
-your predicate:
+You may skip evaluation by calling the ``skip()`` method of your predicate:
 
 .. code:: python
 
     >>> @predicate(bind=True)
-    ... def is_book_author(user, book):
+    ... def is_book_author(self, user, book):
     ...     if self.context.args:
     ...         return user == book.author
     ...     else:
