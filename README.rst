@@ -382,8 +382,12 @@ Now this allows you to specify permissions like this:
     >>> rules.add_perm('books.delete_book', is_book_author)
 
 
+Advanced features
+=================
+
+
 Custom rule sets
-================
+----------------
 
 You may create as many rule sets as you need:
 
@@ -409,6 +413,83 @@ And manipulate them by adding, removing, querying and testing rules:
 
 Note however that custom rule sets are *not available* in Django templates --
 you need to provide integration yourself.
+
+
+Invocation context
+------------------
+
+A new context is created as a result of invoking ``Predicate.test()`` and is
+only valid for the duration of the invocation. A context is a simple ``dict``
+that you can use to store arbitrary data, (eg. caching computed values,
+setting flags, etc.), that can be used by predicates later on in the chain.
+Inside a predicate function it can be used like so:
+
+.. code:: python
+
+    >>> @predicate
+    ... def mypred(a, b):
+    ...     value = compute_expensive_value(a)
+    ...     mypred.context['value'] = value
+    ...     return True
+
+Other predicates can later use stored values:
+
+.. code:: python
+
+    >>> @predicate
+    ... def myotherpred(a, b):
+    ...     value = myotherpred.context.get('value')
+    ...     if value is not None:
+    ...         return do_something_with_value(value)
+    ...     else:
+    ...         return do_something_without_value()
+
+``Predicate.context`` provides a single ``args`` attribute that contains the
+arguments as given to ``test()`` at the beginning of the invocation.
+
+
+Binding ``self``
+----------------
+
+In a predicate's function body, you can refer to the predicate instance itself
+by its name, eg. ``is_book_author``. Passing ``bind=True`` as a keyword
+argument to the ``predicate`` decorator will let you refer to the predicate
+with ``self``, which is more convenient. Binding ``self`` is just syntactic
+sugar. As a matter of fact, the following two are equivalent:
+
+.. code:: python
+
+    >>> @predicate
+    ... def is_book_author(user, book):
+    ...     if is_book_author.context.args:
+    ...         return user == book.author
+    ...     return False
+
+    >>> @predicate(bind=True)
+    ... def is_book_author(self, user, book):
+    ...     if self.context.args:
+    ...         return user == book.author
+    ...     return False
+
+
+Skipping predicates
+-------------------
+
+You may skip evaluation of a predicate by calling the ``skip()`` method of
+your predicate:
+
+.. code:: python
+
+    >>> @predicate(bind=True)
+    ... def is_book_author(user, book):
+    ...     if self.context.args:
+    ...         return user == book.author
+    ...     else:
+    ...         self.skip()
+
+``skip()`` raises a special exception that is caught by ``rules`` to signal
+that a predicate need not be evaluated, thus leaving the predicate result up
+to that point unchanged.
 
 
 Best practices
@@ -476,6 +557,20 @@ when inspecting it:
     >>> pred
     <Predicate:another_name object at 0x10eeaa490>
 
+Also, you may optionally provide ``bind=True`` in order to be able to access
+the predicate instance with ``self``:
+
+.. code:: python
+
+    >>> def is_book_author(self, user, book):
+    ...     if self.context.args:
+    ...         return user == book.author
+    ...     return False
+    ...
+    >>> pred = Predicate(is_book_author, bind=True)
+    >>> pred
+    <Predicate:is_book_author object at 0x10eeaa490>
+
 
 Instance methods
 ++++++++++++++++
@@ -538,6 +633,16 @@ Decorators
         ...
         >>> is_book_author
         <Predicate:another_name object at 0x10eeaa490>
+
+    Binding ``self``:
+    
+    .. code:: python
+    
+        >>> @predicate(bind=True)
+        ... def is_book_author(self, user, book):
+        ...     if 'user_has_special_flag' in self.context:
+        ...         return self.context['user_has_special_flag']
+        ...     return book.author == user
 
 
 Predefined predicates
