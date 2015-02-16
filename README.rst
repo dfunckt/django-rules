@@ -14,6 +14,27 @@ used as a standalone library in other contexts and frameworks.
 .. _decision trees: http://wikipedia.org/wiki/Decision_tree
 
 
+Features
+========
+
+``rules`` has got you covered. ``rules`` is:
+
+-   **Documented**, **tested**, **reliable** and **easy to use**.
+-   **Versatile**. Decorate callables to build complex graphs of predicates.
+    Predicates can be any type of callable -- simple functions, lambdas,
+    methods, callable class objects, partial functions, decorated functions,
+    anything really.
+-   **A good Django citizen**. Seamless integration with Django templates and
+    the Django Admin for testing for object-level permissions.
+-   **Efficient** and **smart**. No need to mess around with a database to figure
+    out whether John really wrote that book.
+-   **Simple**. Dive in the code. You'll need 10 minutes to figure out how it
+    works.
+-   **Powerful**. ``rules`` comes complete with advanced features, such as
+    invocation context and storage for arbitrary data, skipping evaluation of
+    predicates under specific conditions, and more!
+
+
 Requirements
 ============
 
