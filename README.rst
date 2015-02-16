@@ -3,7 +3,7 @@ django-rules
 
 .. image:: https://travis-ci.org/dfunckt/django-rules.svg?branch=master
     :target: https://travis-ci.org/dfunckt/django-rules
-.. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.png
+.. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
     :target: https://coveralls.io/r/dfunckt/django-rules
 
 ``rules`` is a tiny but powerful app providing object-level permissions to
