@@ -307,11 +307,15 @@ def test_skip_predicate():
 
     # because requires_two_args is called with only one argument
     # its result is not taken into account, only the result of the
-    # other predicates matters.
+    # other predicate matters.
     assert (requires_two_args & requires_one_arg).test(True)
     assert not (requires_two_args & requires_one_arg).test(False)
     assert (~requires_two_args & requires_one_arg).test(True)
     assert not (~requires_two_args & requires_one_arg).test(False)
+    assert not (~requires_two_args | requires_one_arg).test(False)
+    assert not (requires_two_args | requires_one_arg).test(False)
+    assert (~requires_two_args | requires_one_arg).test(True)
+    assert (requires_two_args | requires_one_arg).test(True)
 
 
 def test_invocation_context():
