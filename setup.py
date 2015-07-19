@@ -56,6 +56,8 @@ setup(
     ],
     tests_require=[
         'nose',
+        'coverage',
+        'Django >= 1.5',
     ],
 
     classifiers=[

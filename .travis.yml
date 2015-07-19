@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python:
   - "2.6"
@@ -7,9 +8,18 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
+env:
+  - DJANGO='Django<1.6'
+  - DJANGO='Django<1.7'
+  - DJANGO='Django<1.8'
+matrix:
+  exclude:
+    - python: "2.6"
+      env: DJANGO='Django<1.8'
 install:
-  - "pip install ."
-  - "pip install coveralls"
-script: nosetests --with-coverage --cover-package=rules
+  - 'pip install "${DJANGO}"'
+  - pip install coveralls
+  - pip install -e .
+script: ./runtests.sh -v
 after_success:
-  coveralls
+  - coveralls

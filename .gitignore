@@ -10,3 +10,4 @@ dist/
 docs/_build
 pip-log.txt
 .tox
+.eggs/
