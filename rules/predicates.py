@@ -67,7 +67,8 @@ class Predicate(object):
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__
-        else:
+        else:  # pragma: no cover
+            # We handle all cases, so there's no way we can reach here
             raise TypeError('Incompatible predicate.')
         if bind:
             num_args -= 1
@@ -226,10 +227,7 @@ def predicate(fn=None, name=None, **options):
         if isinstance(fn, Predicate):
             return fn
         p = Predicate(fn, name, **options)
-        if isinstance(fn, partial):
-            update_wrapper(p, fn.func)
-        else:
-            update_wrapper(p, fn)
+        update_wrapper(p, fn)
         return p
 
     if fn:
@@ -289,7 +287,7 @@ def is_group_member(*groups):
     def fn(user):
         if not hasattr(user, 'groups'):
             return False  # swapped user model, doesn't support groups
-        if not hasattr(user, '_group_names_cache'):
+        if not hasattr(user, '_group_names_cache'):  # pragma: no cover
             user._group_names_cache = set(user.groups.values_list('name', flat=True))
         return set(groups).issubset(user._group_names_cache)
 

@@ -317,6 +317,19 @@ def test_skip_predicate():
     assert (~requires_two_args | requires_one_arg).test(True)
     assert (requires_two_args | requires_one_arg).test(True)
 
+    # also test that order does not matter
+    assert (requires_one_arg & requires_two_args).test(True)
+    assert not (requires_one_arg & requires_two_args).test(False)
+    assert (requires_one_arg & ~requires_two_args).test(True)
+    assert not (requires_one_arg & ~requires_two_args).test(False)
+    assert not (requires_one_arg | ~requires_two_args).test(False)
+    assert not (requires_one_arg | requires_two_args).test(False)
+    assert (requires_one_arg | ~requires_two_args).test(True)
+    assert (requires_one_arg | requires_two_args).test(True)
+
+    # test that when all predicates are skipped, result is False
+    assert not (requires_two_args | requires_two_args).test(True)
+
 
 def test_invocation_context():
     @predicate

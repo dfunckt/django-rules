@@ -59,6 +59,12 @@ Manually:
     $ cd django-rules
     $ python setup.py install
 
+Run tests with:
+
+.. code:: bash
+
+    $ ./runtests.sh
+
 
 Using ``rules``
 ===============

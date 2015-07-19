@@ -6,4 +6,5 @@ omit =
     */site-packages/nose/*
     */rules/templatetags/*
     */rules/compat/*
+    */rules/contrib/*
     */rules/apps.py
