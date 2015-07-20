@@ -2,9 +2,10 @@ from django.contrib import admin
 
 try:
     from django.contrib.auth import get_permission_codename
-except ImportError:  # Django < 1.6
-    raise NotImplementedError(
-        'Integrating Rules with the Admin, requires Django 1.6 or later')
+except ImportError:  # pragma: no cover
+    # Django < 1.6
+    def get_permission_codename(action, opts):
+        return '%s_%s' % (action, opts.object_name.lower())
 
 
 class ObjectPermissionsModelAdminMixin(object):
@@ -20,7 +21,7 @@ class ObjectPermissionsModelAdminMixin(object):
 
 
 class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
-    def has_change_permission(self, request, obj=None):
+    def has_change_permission(self, request, obj=None):  # pragma: no cover
         opts = self.opts
         if opts.auto_created:
             for field in opts.fields:
@@ -30,7 +31,7 @@ class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
         codename = get_permission_codename('change', opts)
         return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
 
-    def has_delete_permission(self, request, obj=None):
+    def has_delete_permission(self, request, obj=None):  # pragma: no cover
         if self.opts.auto_created:
             return self.has_change_permission(request, obj)
         return super(ObjectPermissionsInlineModelAdminMixin, self).has_delete_permission(request, obj)

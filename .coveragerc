@@ -4,7 +4,5 @@ exclude_lines =
 omit =
     */python?.?/*
     */site-packages/nose/*
-    */rules/templatetags/*
     */rules/compat/*
-    */rules/contrib/*
     */rules/apps.py

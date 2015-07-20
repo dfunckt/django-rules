@@ -1,3 +1,7 @@
+from os.path import abspath, dirname
+
+BASE_DIR = dirname(dirname(abspath(__file__)))
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -13,10 +17,19 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.messages',
+    'django.contrib.sessions',
     'rules',
     'testapp',
+)
+
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -27,3 +40,5 @@ AUTHENTICATION_BACKENDS = (
 CACHE_BACKEND = 'locmem://'
 
 SECRET_KEY = 'thats-a-secret'
+
+ROOT_URLCONF = 'testapp.urls'
