@@ -24,8 +24,8 @@ Features
     Predicates can be any type of callable -- simple functions, lambdas,
     methods, callable class objects, partial functions, decorated functions,
     anything really.
--   **A good Django citizen**. Seamless integration with Django templates and
-    the Django Admin for testing for object-level permissions.
+-   **A good Django citizen**. Seamless integration with Django views,
+    templates and the Admin for testing for object-level permissions.
 -   **Efficient** and **smart**. No need to mess around with a database to figure
     out whether John really wrote that book.
 -   **Simple**. Dive in the code. You'll need 10 minutes to figure out how it
