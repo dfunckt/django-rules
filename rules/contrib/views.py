@@ -9,6 +9,47 @@ from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
 
+try:
+    from django.contrib.auth import mixins
+except ImportError:  # pragma: no cover
+    # Django < 1.9
+    from ..compat import access_mixins as mixins
+
+
+# These are made available for convenience, as well as for use in Django
+# versions before 1.9. For usage help see Django's docs for 1.9 or later.
+LoginRequiredMixin = mixins.LoginRequiredMixin
+UserPassesTestMixin = mixins.UserPassesTestMixin
+
+
+class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
+    """
+    CBV mixin to provide object-level permission checking to views. Best used
+    with views that inherit from ``SingleObjectMixin`` (``DetailView``,
+    ``UpdateView``, etc.), though not required.
+
+    The single requirement is for a ``get_object`` method to be available
+    in the view. If there's no ``get_object`` method, permission checking
+    is model-level, that is exactly like Django's ``PermissionRequiredMixin``.
+    """
+    def get_permission_object(self):
+        """
+        Override this method to provide the object to check for permission
+        against. By default uses ``self.get_object()`` as provided by
+        ``SingleObjectMixin``. Returns None if there's no ``get_object``
+        method.
+        """
+        try:
+            # Requires SingleObjectMixin or equivalent ``get_object`` method
+            return self.get_object()
+        except AttributeError:  # pragma: no cover
+            return None
+
+    def has_permission(self):
+        obj = self.get_permission_object()
+        perms = self.get_permission_required()
+        return self.request.user.has_perms(perms, obj)
+
 
 def objectgetter(model, attr_name='pk', field_name='pk'):
     """
