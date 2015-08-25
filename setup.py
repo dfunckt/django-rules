@@ -49,6 +49,7 @@ setup(
         'rules',
         'rules.templatetags',
         'rules.contrib',
+        'rules.compat',
     ],
 
     install_requires=[
