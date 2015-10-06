@@ -62,6 +62,7 @@ Table of Contents
 
 - `Best practices`_
 - `API Reference`_
+- `Changelog`_
 - `Licence`_
 
 
@@ -836,6 +837,30 @@ Managing the permissions rule set
 
 ``has_perm(name, user=None, obj=None)``
     Tests the rule with the given name. See ``RuleSet.test_rule``.
+
+
+Changelog
+=========
+
+``v0.4`` - 2015/02/16
+    - Added support for creating predicates from partial functions
+    - Added support for creating predicates from instance methods
+    - Added predicate invocation context
+    - Added support for automatically passing ``self`` to a predicate
+    - Added support for discarding a predicate's result
+
+``v0.3`` - 2014/10/15
+    - Added compatibility with PyPy and PyPy 3
+    - Added ``always_true()`` and ``always_false()`` predicates
+    - Added integration with Tox
+    - Bug fixes
+
+``v0.2`` - 2014/06/09
+    - Added compatibility with Python 3.4
+    - Improved admin integration
+
+``v0.1`` - 2014/03/07
+    - Initial public release
 
 
 Licence
