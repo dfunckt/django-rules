@@ -68,7 +68,7 @@ Table of Contents
 Requirements
 ============
 
-``rules`` requires Python 2.6/3.2 or newer. It can optionally integrate with
+``rules`` requires Python 2.6/3.3 or newer. It can optionally integrate with
 Django, in which case requires Django 1.5 or newer.
 
 
