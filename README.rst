@@ -35,6 +35,36 @@ Features
     predicates under specific conditions, and more!
 
 
+Table of Contents
+=================
+
+- `Requirements`_
+- `How to install`_
+- `Using Rules`_
+
+  - `Creating predicates`_
+  - `Setting up rules`_
+  - `Combining predicates`_
+
+- `Using Rules with Django`_
+
+  - `Permissions`_
+  - `Rules and permissions in views`_
+  - `Rules and permissions in templates`_
+  - `Rules and permissions in the Admin`_
+
+- `Advanced features`_
+
+  - `Custom rule sets`_
+  - `Invocation context`_
+  - `Binding "self"`_
+  - `Skipping predicates`_
+
+- `Best practices`_
+- `API Reference`_
+- `Licence`_
+
+
 Requirements
 ============
 
@@ -66,8 +96,8 @@ Run tests with:
     $ ./runtests.sh
 
 
-Using ``rules``
-===============
+Using Rules
+===========
 
 ``rules`` is based on the idea that you maintain a dict-like object that maps
 string keys used as identifiers of some kind, to callables, called
@@ -236,8 +266,8 @@ integrate tightly with Django to provide authorization.
 
 .. _authorization in Django:
 
-Using ``rules`` with Django
-===========================
+Using Rules with Django
+=======================
 
 ``rules`` is able to provide object-level permissions in Django. It comes
 with an authorization backend and a couple template tags for use in your
@@ -440,10 +470,6 @@ imaginary ``books`` app as an example:
     >>> rules.add_perm('books.change_book', is_staff)
     >>> rules.add_perm('books.delete_book', is_staff)
 
-
-Object permissions
-++++++++++++++++++
-
 Django Admin does not support object-permissions, in the sense that it will
 never ask for permission to perform an action *on an object*, only whether a
 user is allowed to act on (*any*) instances of a model.
@@ -549,8 +575,8 @@ Other predicates can later use stored values:
 arguments as given to ``test()`` at the beginning of the invocation.
 
 
-Binding ``self``
-----------------
+Binding "self"
+--------------
 
 In a predicate's function body, you can refer to the predicate instance itself
 by its name, eg. ``is_book_author``. Passing ``bind=True`` as a keyword
