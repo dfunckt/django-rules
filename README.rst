@@ -842,6 +842,13 @@ Managing the permissions rule set
 Changelog
 =========
 
+``v1.0.0`` - 2015/10/06
+    - Initial stable public release
+    - Dropped support for Python 3.2
+    - Added Django test suite
+    - Added function-based view decorator
+    - Added class-based view mixin
+
 ``v0.4`` - 2015/02/16
     - Added support for creating predicates from partial functions
     - Added support for creating predicates from instance methods
