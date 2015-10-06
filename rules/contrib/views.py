@@ -54,7 +54,8 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
 def objectgetter(model, attr_name='pk', field_name='pk'):
     """
     Helper that returns a function suitable for use as the ``fn`` argument
-    to the ``permission_required`` decorator.
+    to the ``permission_required`` decorator. Internally uses
+    ``get_object_or_404``, so keep in mind that this may raise ``Http404``.
 
     ``model`` can be a model class, manager or queryset.
 

@@ -312,6 +312,81 @@ Now, checking again gives ``adrian`` the required permissions:
     False
 
 
+Rules and permissions in views
+------------------------------
+
+``rules`` comes with a set of view decorators to help you enforce
+authorization in your views.
+
+Using the function-based view decorator
++++++++++++++++++++++++++++++++++++++++
+
+For function-based views you can use the ``permission_required`` decorator:
+
+.. code:: python
+
+    from django.shortcuts import get_object_or_404
+    from rules.contrib.views import permission_required
+    from posts.models import Post
+
+    def get_post_by_pk(request, post_id):
+        return get_object_or_404(Post, pk=post_id)
+
+    @permission_required('posts.change_post', fn=get_post_by_pk)
+    def post_update(request, post_id):
+        # ...
+
+Usage is straight-forward, but there's one thing in the example above that
+stands out and this is the ``get_post_by_pk`` function. This function, given
+the current request and all arguments passed to the view, is responsible for
+fetching and returning the object to check permissions against -- i.e. the
+``Post`` instance with PK equal to the given ``post_id`` in the example.
+This specific use-case is quite common so, to save you some typing, ``rules``
+comes with a generic helper function that you can use to do this declaratively.
+The example below is equivalent to the one above:
+
+.. code:: python
+
+    from rules.contrib.views import permission_required, objectgetter
+    from posts.models import Post
+
+    @permission_required('posts.change_post', fn=objectgetter(Post, 'post_id'))
+    def post_update(request, post_id):
+        # ...    
+
+For more information on the decorator and helper function, refer to the
+``rules.contrib.views`` module.
+
+Using the class-based view mixin
+++++++++++++++++++++++++++++++++
+
+Django 1.9 introduced a new set of access mixins that you can use in your
+class-based views to enforce authorization. ``rules`` extends this framework
+to provide a mixin for object-level permissions, ``PermissionRequiredMixin``.
+Note that ``rules`` will seamlessly fall back to importing its own copy of
+Django's access mixins module for versions of Django prior to 1.9.
+
+The following example will automatically test for permission against the
+instance returned by the view's ``get_object`` method:
+
+.. code:: python
+
+    from django.views.generic.edit import UpdateView
+    from rules.contrib.views import PermissionRequiredMixin
+    from posts.models import Post
+
+    class PostUpdate(PermissionRequiredMixin, UpdateView):
+        model = Post
+        permission_required = 'posts.change_post'
+
+You can customise the object either by overriding ``get_object`` or
+``get_permission_object``.
+
+For more information refer to the `Django documentation`_ and the
+``rules.contrib.views`` module.
+
+.. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
+
 Rules and permissions in templates
 ----------------------------------
 
@@ -411,7 +486,6 @@ Now this allows you to specify permissions like this:
 
 Advanced features
 =================
-
 
 Custom rule sets
 ----------------
