@@ -1,4 +1,5 @@
 import functools
+import warnings
 
 from rules.predicates import (
     NO_VALUE,
@@ -291,44 +292,55 @@ def test_no_value_marker():
     p.test('a', NO_VALUE)
 
 
+def test_skip_predicate_deprecation():
+    @predicate(bind=True)
+    def skipped_predicate(self):
+        self.skip()
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert skipped_predicate.test() is None
+        assert len(w) == 1 and 'deprecated' in str(w[-1].message)
+
+
 def test_skip_predicate():
     @predicate(bind=True)
     def requires_two_args(self, a, b):
-        if len(self.context.args) < 2:
-            self.skip()
-        return a == b
+        return a == b if len(self.context.args) > 1 else None
 
     @predicate
-    def requires_one_arg(a):
+    def passthrough(a):
         return a
 
-    assert (requires_two_args & requires_one_arg).test(True, True)
-    assert not (requires_two_args & requires_one_arg).test(True, False)
+    assert (requires_two_args & passthrough).test(True, True) is True
+    assert (requires_two_args & passthrough).test(True, False) is False
 
     # because requires_two_args is called with only one argument
     # its result is not taken into account, only the result of the
     # other predicate matters.
-    assert (requires_two_args & requires_one_arg).test(True)
-    assert not (requires_two_args & requires_one_arg).test(False)
-    assert (~requires_two_args & requires_one_arg).test(True)
-    assert not (~requires_two_args & requires_one_arg).test(False)
-    assert not (~requires_two_args | requires_one_arg).test(False)
-    assert not (requires_two_args | requires_one_arg).test(False)
-    assert (~requires_two_args | requires_one_arg).test(True)
-    assert (requires_two_args | requires_one_arg).test(True)
+    assert (requires_two_args & passthrough).test(True) is True
+    assert (requires_two_args & passthrough).test(False) is False
+    assert (requires_two_args | passthrough).test(True) is True
+    assert (requires_two_args | passthrough).test(False) is False
 
-    # also test that order does not matter
-    assert (requires_one_arg & requires_two_args).test(True)
-    assert not (requires_one_arg & requires_two_args).test(False)
-    assert (requires_one_arg & ~requires_two_args).test(True)
-    assert not (requires_one_arg & ~requires_two_args).test(False)
-    assert not (requires_one_arg | ~requires_two_args).test(False)
-    assert not (requires_one_arg | requires_two_args).test(False)
-    assert (requires_one_arg | ~requires_two_args).test(True)
-    assert (requires_one_arg | requires_two_args).test(True)
+    # test that order does not matter
+    assert (passthrough & requires_two_args).test(True) is True
+    assert (passthrough & requires_two_args).test(False) is False
+    assert (passthrough | requires_two_args).test(True) is True
+    assert (passthrough | requires_two_args).test(False) is False
+
+    # test that inversion does not modify the result
+    assert (~requires_two_args & passthrough).test(True) is True
+    assert (~requires_two_args & passthrough).test(False) is False
+    assert (~requires_two_args | passthrough).test(True) is True
+    assert (~requires_two_args | passthrough).test(False) is False
+    assert (passthrough & ~requires_two_args).test(True) is True
+    assert (passthrough & ~requires_two_args).test(False) is False
+    assert (passthrough | ~requires_two_args).test(True) is True
+    assert (passthrough | ~requires_two_args).test(False) is False
 
     # test that when all predicates are skipped, result is False
-    assert not (requires_two_args | requires_two_args).test(True)
+    assert (requires_two_args | requires_two_args).test(True) is False
 
 
 def test_invocation_context():

@@ -603,21 +603,23 @@ sugar. As a matter of fact, the following two are equivalent:
 Skipping predicates
 -------------------
 
-You may skip evaluation by calling the ``skip()`` method of your predicate:
+You may skip evaluation by returning ``None`` from your predicate:
 
 .. code:: python
 
     >>> @predicate(bind=True)
     ... def is_book_author(self, user, book):
-    ...     if self.context.args:
+    ...     if len(self.context.args) > 1:
     ...         return user == book.author
     ...     else:
-    ...         self.skip()
+    ...         return None
 
-``skip()`` raises a special exception that is caught by ``rules`` to signal
-that a predicate need not be evaluated, thus leaving the predicate result up
-to that point unchanged.
+Returning ``None`` signifies that the predicate need not be evaluated, thus
+leaving the predicate result up to that point unchanged.
 
+**Note:** This is new in version 1.1.0. It was possible to skip predicates in
+older versions by calling the predicate's ``skip()`` method, but this has been
+deprecated and support will be completely removed in a future version.
 
 Best practices
 ==============

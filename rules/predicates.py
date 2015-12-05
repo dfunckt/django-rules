@@ -2,13 +2,18 @@ import inspect
 import operator
 import threading
 from functools import partial, update_wrapper
+from warnings import warn
 
 
 class SkipPredicate(Exception):
     """
     Use to reject usage of a predicate.
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        warn('Skipping predicates by raising the SkipPredicate exception '
+             'has been deprecated. Return `None` from your predicate instead.',
+             DeprecationWarning)
+        super(SkipPredicate, self).__init__(*args, **kwargs)
 
 
 class Context(dict):
@@ -150,22 +155,6 @@ class Predicate(object):
         finally:
             _context.stack.pop()
 
-    def _combine(self, other, op, args):
-        try:
-            self_result = self._apply(*args)
-        except SkipPredicate:
-            try:
-                return other._apply(*args)
-            except SkipPredicate:
-                return False
-        else:
-            try:
-                other_result = other._apply(*args)
-            except SkipPredicate:
-                return self_result
-            else:
-                return op(self_result, other_result)
-
     def __and__(self, other):
         def AND(*args):
             return self._combine(other, operator.and_, args)
@@ -183,12 +172,24 @@ class Predicate(object):
 
     def __invert__(self):
         def INVERT(*args):
-            return not self._apply(*args)
+            result = self._apply(*args)
+            return None if result is None else not result
         if self.name.startswith('~'):
             name = self.name[1:]
         else:
             name = '~' + self.name
         return type(self)(INVERT, name)
+
+    def _combine(self, other, op, args):
+        self_result = self._apply(*args)
+        if self_result is None:
+            return bool(other._apply(*args))
+
+        other_result = other._apply(*args)
+        if other_result is None:
+            return self_result
+
+        return op(self_result, other_result)
 
     def _apply(self, *args):
         # Internal method that is used to invoke the predicate with the
@@ -202,7 +203,11 @@ class Predicate(object):
             callargs = args[:self.num_args]
         if self.bind:
             callargs = (self,) + callargs
-        return bool(self.fn(*callargs))
+        try:
+            result = self.fn(*callargs)
+            return None if result is None else bool(result)
+        except SkipPredicate:
+            return None
 
 
 def predicate(fn=None, name=None, **options):
