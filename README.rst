@@ -846,6 +846,13 @@ Managing the permissions rule set
 Changelog
 =========
 
+``v1.1.0`` - 2015/12/05
+    - Fixed regression that wouldn't short-circuit boolean expressions
+    - Added support for Django 1.9 and Python 3.5
+    - Added support for skipping predicates simply by returning ``None``.
+      The previous way of skipping predicates by raising ``SkipPredicate``
+      has been deprecated and will not be supported in a future release.
+
 ``v1.0.0`` - 2015/10/06
     - Initial stable public release
     - Dropped support for Python 3.2
