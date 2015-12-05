@@ -185,6 +185,12 @@ class Predicate(object):
         if self_result is None:
             return bool(other._apply(*args))
 
+        # short-circuit evaluation
+        if op is operator.and_ and not self_result:
+            return False
+        elif op is operator.or_ and self_result:
+            return True
+
         other_result = other._apply(*args)
         if other_result is None:
             return self_result

@@ -292,6 +292,31 @@ def test_no_value_marker():
     p.test('a', NO_VALUE)
 
 
+def test_short_circuit():
+    @predicate
+    def skipped_predicate(self):
+        return None
+
+    @predicate
+    def shorted_predicate(self):
+        raise Exception('this predicate should not be evaluated')
+
+    assert (always_false & shorted_predicate).test() is False
+    assert (always_true | shorted_predicate).test() is True
+
+    def raises(pred):
+        try:
+            pred.test()
+            return False
+        except Exception as e:
+            return 'evaluated' in str(e)
+
+    assert raises(always_true & shorted_predicate)
+    assert raises(always_false | shorted_predicate)
+    assert raises(skipped_predicate & shorted_predicate)
+    assert raises(skipped_predicate | shorted_predicate)
+
+
 def test_skip_predicate_deprecation():
     @predicate(bind=True)
     def skipped_predicate(self):

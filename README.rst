@@ -195,9 +195,11 @@ function would be. Predicates, however, can be combined using binary operators
 to create more complex ones. Predicates support the following operators:
 
 *   ``P1 & P2``: Returns a new predicate that returns ``True`` if *both*
-    predicates return ``True``, otherwise ``False``.
+    predicates return ``True``, otherwise ``False``. If P1 returns ``False``,
+    P2 will not be evaluated.
 *   ``P1 | P2``: Returns a new predicate that returns ``True`` if *any* of the
-    predicates returns ``True``, otherwise ``False``.
+    predicates returns ``True``, otherwise ``False``. If P1 returns ``True``,
+    P2 will not be evaluated.
 *   ``P1 ^ P2``: Returns a new predicate that returns ``True`` if one of the
     predicates returns ``True`` and the other returns ``False``, otherwise
     ``False``.
