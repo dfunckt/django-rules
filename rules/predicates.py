@@ -151,7 +151,7 @@ class Predicate(object):
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
         try:
-            return self._apply(*args)
+            return bool(self._apply(*args))
         finally:
             _context.stack.pop()
 
@@ -183,7 +183,7 @@ class Predicate(object):
     def _combine(self, other, op, args):
         self_result = self._apply(*args)
         if self_result is None:
-            return bool(other._apply(*args))
+            return other._apply(*args)
 
         # short-circuit evaluation
         if op is operator.and_ and not self_result:

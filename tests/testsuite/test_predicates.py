@@ -324,7 +324,7 @@ def test_skip_predicate_deprecation():
 
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter('always')
-        assert skipped_predicate.test() is None
+        assert skipped_predicate.test() is False
         assert len(w) == 1 and 'deprecated' in str(w[-1].message)
 
 
@@ -365,7 +365,13 @@ def test_skip_predicate():
     assert (passthrough | ~requires_two_args).test(False) is False
 
     # test that when all predicates are skipped, result is False
+    assert requires_two_args.test(True) is False
     assert (requires_two_args | requires_two_args).test(True) is False
+    assert (requires_two_args & requires_two_args).test(True) is False
+
+    # test that a skipped predicate doesn't alter the result at all
+    assert (requires_two_args | requires_two_args | passthrough).test(True) is True
+    assert (requires_two_args & requires_two_args & passthrough).test(True) is True
 
 
 def test_invocation_context():
