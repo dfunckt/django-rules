@@ -846,6 +846,9 @@ Managing the permissions rule set
 Changelog
 =========
 
+``v1.1.1`` - 2015/12/07
+    - Improved handling of skipped predicates
+
 ``v1.1.0`` - 2015/12/05
     - Fixed regression that wouldn't short-circuit boolean expressions
     - Added support for Django 1.9 and Python 3.5
