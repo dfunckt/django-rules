@@ -46,8 +46,8 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
             return None
 
     def has_permission(self):
-        obj = self.get_permission_object()
         perms = self.get_permission_required()
+        obj = self.get_permission_object()
         return self.request.user.has_perms(perms, obj)
 
 
