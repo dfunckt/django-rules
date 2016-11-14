@@ -17,6 +17,7 @@ def perm_exists(name):
 
 
 def has_perm(name, *args, **kwargs):
+    kwargs['perm'] = name
     return permissions.test_rule(name, *args, **kwargs)
 
 
