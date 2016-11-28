@@ -848,7 +848,7 @@ Testing
 
 When using Django's built in `TestClient` using the `force_login` method will fail unless you specify a specific authentication backend.
 
-To do this pass ``django.contrib.auth.backends.ModelBackend`` as the ``backend`` argument:
+To work around this pass ``django.contrib.auth.backends.ModelBackend`` as the ``backend`` argument:
 
 ``client.force_login(user, backend='django.contrib.auth.backends.ModelBackend')``
 
