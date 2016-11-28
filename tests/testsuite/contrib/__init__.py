@@ -9,6 +9,7 @@ ISBN = '978-1-4302-1936-1'
 
 def setup_package():
     adrian = User.objects.create_user('adrian', password='secr3t')
+    adrian.is_superuser = True
     adrian.is_staff = True
     adrian.save()
 

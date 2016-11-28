@@ -4,10 +4,27 @@ import warnings
 from rules.predicates import (
     NO_VALUE,
     Predicate,
+    always_allow,
+    always_deny,
     always_false,
     always_true,
     predicate,
 )
+
+def test_always_true():
+    assert always_true()
+
+
+def test_always_false():
+    assert not always_false()
+
+
+def test_always_allow():
+    assert always_allow()
+
+
+def test_always_deny():
+    assert not always_deny()
 
 
 def test_lambda_predicate():
