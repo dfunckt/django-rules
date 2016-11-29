@@ -256,11 +256,18 @@ always_allow = predicate(lambda: True, name='always_allow')
 always_deny = predicate(lambda: False, name='always_deny')
 
 
+def is_bool_like(obj):
+    return hasattr(obj, '__bool__') or hasattr(obj, '__nonzero__')
+
+
 @predicate
 def is_authenticated(user):
     if not hasattr(user, 'is_authenticated'):
         return False  # not a user model
-    return user.is_authenticated()
+    if not is_bool_like(user.is_authenticated):  # pragma: no cover
+        # Django < 1.10
+        return user.is_authenticated()
+    return user.is_authenticated
 
 
 @predicate
