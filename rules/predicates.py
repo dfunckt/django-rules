@@ -1,8 +1,12 @@
 import inspect
 import operator
 import threading
+import logging
 from functools import partial, update_wrapper
 from warnings import warn
+
+
+logger = logging.getLogger('django-rules')
 
 
 class SkipPredicate(Exception):
@@ -150,6 +154,7 @@ class Predicate(object):
         """
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
+        logger.info('Testing %s', self)
         try:
             return bool(self._apply(*args))
         finally:
@@ -211,7 +216,9 @@ class Predicate(object):
             callargs = (self,) + callargs
         try:
             result = self.fn(*callargs)
-            return None if result is None else bool(result)
+            returner = None if result is None else bool(result)
+            logger.info('%s = %s', self, returner)
+            return returner
         except SkipPredicate:
             return None
 
