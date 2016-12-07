@@ -217,10 +217,11 @@ class Predicate(object):
         try:
             result = self.fn(*callargs)
             returner = None if result is None else bool(result)
-            logger.info('%s = %s', self, returner)
-            return returner
         except SkipPredicate:
-            return None
+            returner = None
+        
+        logger.info('%s = %s', self, 'skipped' if returner is None else returner)
+        return returner
 
 
 def predicate(fn=None, name=None, **options):
