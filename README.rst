@@ -633,6 +633,7 @@ Complex or heavily nested rules can be painful to debug. This package provides a
 This is a basic configuration (place in your `settings.py`):
 
 .. code:: python
+
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
