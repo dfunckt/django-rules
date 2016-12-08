@@ -32,7 +32,7 @@ Features
     works.
 -   **Powerful**. ``rules`` comes complete with advanced features, such as
     invocation context and storage for arbitrary data, skipping evaluation of
-    predicates under specific conditions, and more!
+    predicates under specific conditions, logging of evaluated predicates and more!
 
 
 Table of Contents
@@ -59,6 +59,7 @@ Table of Contents
   - `Invocation context`_
   - `Binding "self"`_
   - `Skipping predicates`_
+  - `Logging predicate evaluation`_
 
 - `Best practices`_
 - `API Reference`_
@@ -622,6 +623,36 @@ leaving the predicate result up to that point unchanged.
 **Note:** This is new in version 1.1.0. It was possible to skip predicates in
 older versions by calling the predicate's ``skip()`` method, but this has been
 deprecated and support will be completely removed in a future version.
+
+
+Logging predicate evaluation
+----------------------------
+
+Complex or heavily nested rules can be painful to debug. This package provides a `django-rules` logger that can be configured in your django settings to output the results of individual evaluations to the console. Messages are sent at the `DEBUG` level.
+
+This is a basic configuration (place in your `settings.py`):
+
+.. code:: python
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django-rules': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
+When this logger is active each individual predicate will have a log message printed when it is evaluated.
+
 
 Best practices
 ==============
