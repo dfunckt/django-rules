@@ -154,7 +154,7 @@ class Predicate(object):
         """
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
-        logger.info('Testing %s', self)
+        logger.debug('Testing %s', self)
         try:
             return bool(self._apply(*args))
         finally:
@@ -220,7 +220,7 @@ class Predicate(object):
         except SkipPredicate:
             returner = None
         
-        logger.info('%s = %s', self, 'skipped' if returner is None else returner)
+        logger.debug('%s = %s', self, 'skipped' if returner is None else returner)
         return returner
 
 
