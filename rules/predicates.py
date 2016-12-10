@@ -6,7 +6,7 @@ from functools import partial, update_wrapper
 from warnings import warn
 
 
-logger = logging.getLogger('django-rules')
+logger = logging.getLogger('rules')
 
 
 class SkipPredicate(Exception):
@@ -216,12 +216,13 @@ class Predicate(object):
             callargs = (self,) + callargs
         try:
             result = self.fn(*callargs)
-            returner = None if result is None else bool(result)
+            if result is not None:
+                result = bool(result)
         except SkipPredicate:
-            returner = None
+            result = None
         
-        logger.debug('%s = %s', self, 'skipped' if returner is None else returner)
-        return returner
+        logger.debug('  %s = %s', self, 'skipped' if result is None else result)
+        return result
 
 
 def predicate(fn=None, name=None, **options):
