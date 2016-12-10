@@ -628,9 +628,10 @@ deprecated and support will be completely removed in a future version.
 Logging predicate evaluation
 ----------------------------
 
-Complex or heavily nested rules can be painful to debug. This package provides a `django-rules` logger that can be configured in your django settings to output the results of individual evaluations to the console. Messages are sent at the `DEBUG` level.
-
-This is a basic configuration (place in your `settings.py`):
+rules can optionally be configured to log debug information as rules are
+evaluated to help with debugging your predicates. Messages are sent at the
+DEBUG level to the `rules` logger. The following dictConfig configures the
+logger to log to the console (place in your `settings.py`): 
 
 .. code:: python
 
@@ -644,7 +645,7 @@ This is a basic configuration (place in your `settings.py`):
             },
         },
         'loggers': {
-            'django-rules': {
+            'rules': {
                 'handlers': ['console'],
                 'level': 'DEBUG',
                 'propagate': True,
