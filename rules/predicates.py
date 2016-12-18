@@ -1,7 +1,7 @@
 import inspect
+import logging
 import operator
 import threading
-import logging
 from functools import partial, update_wrapper
 from warnings import warn
 
@@ -216,8 +216,7 @@ class Predicate(object):
             callargs = (self,) + callargs
         try:
             result = self.fn(*callargs)
-            if result is not None:
-                result = bool(result)
+            result = None if result is None else bool(result)
         except SkipPredicate:
             result = None
         

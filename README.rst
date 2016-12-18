@@ -628,10 +628,11 @@ deprecated and support will be completely removed in a future version.
 Logging predicate evaluation
 ----------------------------
 
-rules can optionally be configured to log debug information as rules are
+``rules`` can optionally be configured to log debug information as rules are
 evaluated to help with debugging your predicates. Messages are sent at the
-DEBUG level to the `rules` logger. The following dictConfig configures the
-logger to log to the console (place in your `settings.py`): 
+DEBUG level to the ``'rules'`` logger. The following `dictConfig`_ configures
+a console logger (place this in your project's `settings.py` if you're using
+`rules` with Django): 
 
 .. code:: python
 
@@ -653,7 +654,10 @@ logger to log to the console (place in your `settings.py`):
         },
     }
 
-When this logger is active each individual predicate will have a log message printed when it is evaluated.
+When this logger is active each individual predicate will have a log message
+printed when it is evaluated.
+
+.. _dictConfig: https://docs.python.org/3.6/library/logging.config.html#logging-config-dictschema
 
 
 Best practices
