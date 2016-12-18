@@ -1,15 +1,19 @@
 django-rules
 ^^^^^^^^^^^^
 
-.. image:: https://travis-ci.org/dfunckt/django-rules.svg?branch=master
-    :target: https://travis-ci.org/dfunckt/django-rules
-.. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
-    :target: https://coveralls.io/r/dfunckt/django-rules
-
 ``rules`` is a tiny but powerful app providing object-level permissions to
 Django, without requiring a database. At its core, it is a generic framework
 for building rule-based systems, similar to `decision trees`_. It can also be
 used as a standalone library in other contexts and frameworks.
+
+.. image:: https://travis-ci.org/dfunckt/django-rules.svg?branch=master
+    :target: https://travis-ci.org/dfunckt/django-rules
+.. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
+    :target: https://coveralls.io/r/dfunckt/django-rules
+.. image:: https://img.shields.io/pypi/v/rules.svg
+    :target: https://pypi.python.org/pypi/django-rules
+.. image:: https://img.shields.io/pypi/pyversions/rules.svg
+    :target: https://pypi.python.org/pypi/django-rules
 
 .. _decision trees: http://wikipedia.org/wiki/Decision_tree
 
