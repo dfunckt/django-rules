@@ -44,6 +44,9 @@ Table of Contents
 
 - `Requirements`_
 - `How to install`_
+
+  - `Configuring Django`_
+
 - `Using Rules`_
 
   - `Creating predicates`_
@@ -100,6 +103,31 @@ Run tests with:
 .. code:: bash
 
     $ ./runtests.sh
+
+You may also want to read `Best practices`_ for general advice on how to
+use ``rules``.
+
+
+Configuring Django
+------------------
+
+Add ``rules`` to ``INSTALLED_APPS``:
+
+.. code:: python
+
+    INSTALLED_APPS = (
+        # ...
+        'rules',
+    )
+
+Add the authentication backend:
+
+.. code:: python
+
+    AUTHENTICATION_BACKENDS = (
+        'rules.permissions.ObjectPermissionBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 
 Using Rules
