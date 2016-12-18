@@ -32,7 +32,7 @@ Features
     works.
 -   **Powerful**. ``rules`` comes complete with advanced features, such as
     invocation context and storage for arbitrary data, skipping evaluation of
-    predicates under specific conditions, and more!
+    predicates under specific conditions, logging of evaluated predicates and more!
 
 
 Table of Contents
@@ -59,6 +59,7 @@ Table of Contents
   - `Invocation context`_
   - `Binding "self"`_
   - `Skipping predicates`_
+  - `Logging predicate evaluation`_
 
 - `Best practices`_
 - `API Reference`_
@@ -622,6 +623,42 @@ leaving the predicate result up to that point unchanged.
 **Note:** This is new in version 1.1.0. It was possible to skip predicates in
 older versions by calling the predicate's ``skip()`` method, but this has been
 deprecated and support will be completely removed in a future version.
+
+
+Logging predicate evaluation
+----------------------------
+
+``rules`` can optionally be configured to log debug information as rules are
+evaluated to help with debugging your predicates. Messages are sent at the
+DEBUG level to the ``'rules'`` logger. The following `dictConfig`_ configures
+a console logger (place this in your project's `settings.py` if you're using
+`rules` with Django): 
+
+.. code:: python
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'rules': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
+When this logger is active each individual predicate will have a log message
+printed when it is evaluated.
+
+.. _dictConfig: https://docs.python.org/3.6/library/logging.config.html#logging-config-dictschema
+
 
 Best practices
 ==============

@@ -1,8 +1,12 @@
 import inspect
+import logging
 import operator
 import threading
 from functools import partial, update_wrapper
 from warnings import warn
+
+
+logger = logging.getLogger('rules')
 
 
 class SkipPredicate(Exception):
@@ -150,6 +154,7 @@ class Predicate(object):
         """
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
+        logger.debug('Testing %s', self)
         try:
             return bool(self._apply(*args))
         finally:
@@ -211,9 +216,12 @@ class Predicate(object):
             callargs = (self,) + callargs
         try:
             result = self.fn(*callargs)
-            return None if result is None else bool(result)
+            result = None if result is None else bool(result)
         except SkipPredicate:
-            return None
+            result = None
+        
+        logger.debug('  %s = %s', self, 'skipped' if result is None else result)
+        return result
 
 
 def predicate(fn=None, name=None, **options):
