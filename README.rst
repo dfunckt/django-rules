@@ -11,9 +11,9 @@ used as a standalone library in other contexts and frameworks.
 .. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
     :target: https://coveralls.io/r/dfunckt/django-rules
 .. image:: https://img.shields.io/pypi/v/rules.svg
-    :target: https://pypi.python.org/pypi/django-rules
+    :target: https://pypi.python.org/pypi/rules
 .. image:: https://img.shields.io/pypi/pyversions/rules.svg
-    :target: https://pypi.python.org/pypi/django-rules
+    :target: https://pypi.python.org/pypi/rules
 
 .. _decision trees: http://wikipedia.org/wiki/Decision_tree
 
