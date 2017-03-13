@@ -4,6 +4,7 @@
 #   2.7   1.5  1.6  1.7  1.8  1.9  1.10
 #   3.4             1.7  1.8  1.9  1.10
 #   3.5                  1.8  1.9  1.10
+#   3.6                  1.8  1.9  1.10
 # ----------------------------------------
 sudo: false
 language: python
@@ -17,12 +18,6 @@ python:
 env:
   - DJANGO='Django<1.9'  # Django 1.8
   - DJANGO='Django<1.11' # Django 1.10
-matrix:
-  exclude:
-    - python: "pypy3"
-      env: DJANGO='Django<1.10'
-    - python: "pypy3"
-      env: DJANGO='Django<1.11'
 install:
   - 'pip install "${DJANGO}"'
   - pip install coveralls
