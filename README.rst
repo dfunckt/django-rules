@@ -77,8 +77,8 @@ Table of Contents
 Requirements
 ============
 
-``rules`` requires Python 2.6/3.3 or newer. It can optionally integrate with
-Django, in which case requires Django 1.5 or newer.
+``rules`` requires Python 2.7/3.4 or newer. It can optionally integrate with
+Django, in which case requires Django 1.8 or newer.
 
 
 How to install
@@ -451,7 +451,7 @@ You can customise the object either by overriding ``get_object`` or
 For more information refer to the `Django documentation`_ and the
 ``rules.contrib.views`` module.
 
-.. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
+.. _Django documentation: https://docs.djangoproject.com/en/1.10/topics/auth/default/#limiting-access-to-logged-in-users
 
 Rules and permissions in templates
 ----------------------------------
@@ -708,7 +708,7 @@ On the other hand, because importing predicates from all over the place in
 order to define rules can lead to circular imports and broken hearts, it's
 best to further split predicates and rules in different modules.
 
-If using Django 1.7 and later, ``rules`` may optionally be configured to
+``rules`` may optionally be configured to
 autodiscover ``rules.py`` modules in your apps and import them at startup. To
 have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
 

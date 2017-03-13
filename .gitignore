@@ -11,3 +11,5 @@ docs/_build
 pip-log.txt
 .tox
 .eggs/
+.idea/
+build/
