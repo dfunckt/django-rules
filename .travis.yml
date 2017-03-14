@@ -14,7 +14,6 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-  - "pypy3"
 env:
   - DJANGO='Django<1.9'  # Django 1.8
   - DJANGO='Django<1.11' # Django 1.10
