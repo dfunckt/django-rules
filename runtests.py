@@ -16,13 +16,8 @@ def main():
 
     environ['DJANGO_SETTINGS_MODULE'] = 'testapp.settings'
 
-    try:
-        # django >= 1.7
-        from django import setup
-    except ImportError:
-        pass
-    else:
-        setup()
+    from django import setup
+    setup()
 
     # setup test env
     from django.test.utils import setup_test_environment
@@ -34,10 +29,7 @@ def main():
         'interactive': False,
         'verbosity': 1,
     }
-    try:
-        call_command('migrate', **options)
-    except CommandError:  # Django < 1.7
-        call_command('syncdb', **options)
+    call_command('migrate', **options)
 
     # run tests
     return nose.main()
