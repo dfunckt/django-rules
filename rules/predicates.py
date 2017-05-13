@@ -76,6 +76,94 @@ class Predicate(object):
             return self.fn(self, *args, **kwargs)
         return self.fn(*args, **kwargs)
 
+    def test(self, *args, **kwargs):
+        """
+        The canonical method to invoke predicates.
+        """
+        logger.debug('Testing %s', self)
+
+        if len(args) is 1 and len(kwargs) is 0 and isinstance(args[0], Context):
+            context = args[0]
+        else:
+            warn('Invoking `Predicate.test` with arbitrary arguments has been '
+                 'deprecated. You must instantiate and pass a Context directly '
+                 'or use `RuleSet.test_rule` instead.', DeprecationWarning)
+            # try to convert kwargs to positional if needed
+            callargs = []
+            for i, n in enumerate(['obj', 'target']):
+                if len(args) > i:
+                    callargs.append(args[i])
+                elif n in kwargs:
+                    callargs.append(kwargs[n])
+            context = Context(None, *callargs)
+
+        with context:
+            return bool(self._apply(*context.args))
+
+    def _apply(self, *args):
+        # Internal method that is used to invoke the predicate with the
+        # proper number of positional arguments, inside the current
+        # invocation context. If the predicate accepts more arguments than
+        # given, the predicate will receive `None` for these extra arguments.
+        if self.var_args:
+            callargs = args
+        elif self.num_args > len(args):
+            callargs = args + (None,) * (self.num_args - len(args))
+        else:
+            callargs = args[:self.num_args]
+        if self.bind:
+            callargs = (self,) + callargs
+        try:
+            result = self.fn(*callargs)
+            result = None if result is None else bool(result)
+        except SkipPredicate:
+            result = None
+
+        logger.debug('  %s = %s', self, 'skipped' if result is None else result)
+        return result
+
+    def _combine(self, other, op, args):
+        self_result = self._apply(*args)
+        if self_result is None:
+            return other._apply(*args)
+
+        # short-circuit evaluation
+        if op is operator.and_ and not self_result:
+            return False
+        elif op is operator.or_ and self_result:
+            return True
+
+        other_result = other._apply(*args)
+        if other_result is None:
+            return self_result
+
+        return op(self_result, other_result)
+
+    def __and__(self, other):
+        def AND(*args):
+            return self._combine(other, operator.and_, args)
+        return type(self)(AND, '(%s & %s)' % (self.name, other.name))
+
+    def __or__(self, other):
+        def OR(*args):
+            return self._combine(other, operator.or_, args)
+        return type(self)(OR, '(%s | %s)' % (self.name, other.name))
+
+    def __xor__(self, other):
+        def XOR(*args):
+            return self._combine(other, operator.xor, args)
+        return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
+
+    def __invert__(self):
+        def INVERT(*args):
+            result = self._apply(*args)
+            return None if result is None else not result
+        if self.name.startswith('~'):
+            name = self.name[1:]
+        else:
+            name = '~' + self.name
+        return type(self)(INVERT, name)
+
     @property
     def context(self):
         """
@@ -119,94 +207,6 @@ class Predicate(object):
         ignored for the current invocation.
         """
         raise SkipPredicate()
-
-    def test(self, *args, **kwargs):
-        """
-        The canonical method to invoke predicates.
-        """
-        logger.debug('Testing %s', self)
-
-        if len(args) is 1 and len(kwargs) is 0 and isinstance(args[0], Context):
-            context = args[0]
-        else:
-            warn('Invoking `Predicate.test` with arbitrary arguments has been '
-                 'deprecated. You must instantiate and pass a Context directly '
-                 'or use `RuleSet.test_rule` instead.', DeprecationWarning)
-            # try to convert kwargs to positional if needed
-            callargs = []
-            for i, n in enumerate(['obj', 'target']):
-                if len(args) > i:
-                    callargs.append(args[i])
-                elif n in kwargs:
-                    callargs.append(kwargs[n])
-            context = Context(None, *callargs)
-
-        with context:
-            return bool(self._apply(*context.args))
-
-    def __and__(self, other):
-        def AND(*args):
-            return self._combine(other, operator.and_, args)
-        return type(self)(AND, '(%s & %s)' % (self.name, other.name))
-
-    def __or__(self, other):
-        def OR(*args):
-            return self._combine(other, operator.or_, args)
-        return type(self)(OR, '(%s | %s)' % (self.name, other.name))
-
-    def __xor__(self, other):
-        def XOR(*args):
-            return self._combine(other, operator.xor, args)
-        return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
-
-    def __invert__(self):
-        def INVERT(*args):
-            result = self._apply(*args)
-            return None if result is None else not result
-        if self.name.startswith('~'):
-            name = self.name[1:]
-        else:
-            name = '~' + self.name
-        return type(self)(INVERT, name)
-
-    def _combine(self, other, op, args):
-        self_result = self._apply(*args)
-        if self_result is None:
-            return other._apply(*args)
-
-        # short-circuit evaluation
-        if op is operator.and_ and not self_result:
-            return False
-        elif op is operator.or_ and self_result:
-            return True
-
-        other_result = other._apply(*args)
-        if other_result is None:
-            return self_result
-
-        return op(self_result, other_result)
-
-    def _apply(self, *args):
-        # Internal method that is used to invoke the predicate with the
-        # proper number of positional arguments, inside the current
-        # invocation context. If the predicate accepts more arguments than
-        # given, the predicate will receive `None` for these extra arguments.
-        if self.var_args:
-            callargs = args
-        elif self.num_args > len(args):
-            callargs = args + (None,) * (self.num_args - len(args))
-        else:
-            callargs = args[:self.num_args]
-        if self.bind:
-            callargs = (self,) + callargs
-        try:
-            result = self.fn(*callargs)
-            result = None if result is None else bool(result)
-        except SkipPredicate:
-            result = None
-
-        logger.debug('  %s = %s', self, 'skipped' if result is None else result)
-        return result
 
 
 def predicate(fn=None, name=None, **options):
