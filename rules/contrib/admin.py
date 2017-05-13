@@ -1,11 +1,5 @@
 from django.contrib import admin
-
-try:
-    from django.contrib.auth import get_permission_codename
-except ImportError:  # pragma: no cover
-    # Django < 1.6
-    def get_permission_codename(action, opts):
-        return '%s_%s' % (action, opts.object_name.lower())
+from django.contrib.auth import get_permission_codename
 
 
 class ObjectPermissionsModelAdminMixin(object):
