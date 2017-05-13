@@ -915,6 +915,9 @@ Managing the permissions rule set
 Changelog
 =========
 
+``v1.2.1`` - 2017/05/13
+    - Reverted "Fixed undesired caching in `is_group_member` factory"
+
 ``v1.2.0`` - 2016/12/18
     - Added logging to predicates
     - Added support for Django 1.10
