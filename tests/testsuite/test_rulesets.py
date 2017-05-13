@@ -1,6 +1,6 @@
 from nose.tools import nottest, with_setup, assert_raises
 
-from rules.predicates import predicate
+from rules.predicates import always_true
 from rules.rulesets import (RuleSet, default_rules, add_rule, remove_rule,
                             rule_exists, test_rule)
 
@@ -13,11 +13,6 @@ def reset_ruleset(ruleset):
         for k in list(ruleset.keys()):
             ruleset.pop(k)
     return fn
-
-
-@predicate
-def always_true():
-    return True
 
 
 @with_setup(reset_ruleset(default_rules), reset_ruleset(default_rules))

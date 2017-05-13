@@ -1,9 +1,15 @@
+import logging
+
+from .context import Context
 from .predicates import predicate
+
+logger = logging.getLogger('rules')
 
 
 class RuleSet(dict):
     def test_rule(self, name, *args, **kwargs):
-        return name in self and self[name].test(*args, **kwargs)
+        logger.debug('Testing rule %s', name)
+        return name in self and self[name].test(Context(name, *args, **kwargs))
 
     def rule_exists(self, name):
         return name in self

@@ -1,10 +1,10 @@
 import inspect
 import logging
 import operator
-import threading
 from functools import partial, update_wrapper
 from warnings import warn
 
+from .context import Context, get_current as get_current_context
 
 logger = logging.getLogger('rules')
 
@@ -20,38 +20,10 @@ class SkipPredicate(Exception):
         super(SkipPredicate, self).__init__(*args, **kwargs)
 
 
-class Context(dict):
-    def __init__(self, args):
-        super(Context, self).__init__()
-        self.args = args
-
-
-class localcontext(threading.local):
-    def __init__(self):
-        self.stack = []
-
-
-_context = localcontext()
-
-
-class NoValueSentinel(object):
-    def __bool__(self):
-        return False
-
-    __nonzero__ = __bool__  # python 2
-
-
-NO_VALUE = NoValueSentinel()
-
-del NoValueSentinel
-
-
 class Predicate(object):
     def __init__(self, fn, name=None, bind=False):
-        # fn can be a callable with any of the following signatures:
-        #   - fn(obj=None, target=None)
-        #   - fn(obj=None)
-        #   - fn()
+        # fn can be a callable that accepts any number of positional
+        # arguments, including zero.
         assert callable(fn), 'The given predicate is not callable.'
         if isinstance(fn, Predicate):
             fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
@@ -81,7 +53,6 @@ class Predicate(object):
             raise TypeError('Incompatible predicate.')
         if bind:
             num_args -= 1
-        assert num_args <= 2, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
         self.var_args = var_args
@@ -99,7 +70,8 @@ class Predicate(object):
         # this method is defined as variadic in order to not mask the
         # underlying callable's signature that was most likely decorated
         # as a predicate. internally we consistently call ``_apply`` that
-        # provides a single interface to the callable.
+        # provides a single interface to the callable. a Context is not
+        # created when the predicate is invoked this way.
         if self.bind:
             return self.fn(self, *args, **kwargs)
         return self.fn(*args, **kwargs)
@@ -107,9 +79,9 @@ class Predicate(object):
     @property
     def context(self):
         """
-        The currently active invocation context. A new context is created as a
-        result of invoking ``test()`` and is only valid for the duration of
-        the invocation.
+        The currently active invocation context. A new context is created as
+        a result of invoking ``RuleSet.test_rule()`` and is only valid for
+        the duration of the invocation.
 
         Can be used by predicates to store arbitrary data, eg. for caching
         computed values, setting flags, etc., that can be used by predicates
@@ -137,7 +109,7 @@ class Predicate(object):
 
         """
         try:
-            return _context.stack[-1]
+            return get_current_context()
         except IndexError:
             return None
 
@@ -148,17 +120,29 @@ class Predicate(object):
         """
         raise SkipPredicate()
 
-    def test(self, obj=NO_VALUE, target=NO_VALUE):
+    def test(self, *args, **kwargs):
         """
         The canonical method to invoke predicates.
         """
-        args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
-        _context.stack.append(Context(args))
         logger.debug('Testing %s', self)
-        try:
-            return bool(self._apply(*args))
-        finally:
-            _context.stack.pop()
+
+        if len(args) is 1 and len(kwargs) is 0 and isinstance(args[0], Context):
+            context = args[0]
+        else:
+            warn('Invoking `Predicate.test` with arbitrary arguments has been '
+                 'deprecated. You must instantiate and pass a Context directly '
+                 'or use `RuleSet.test_rule` instead.', DeprecationWarning)
+            # try to convert kwargs to positional if needed
+            callargs = []
+            for i, n in enumerate(['obj', 'target']):
+                if len(args) > i:
+                    callargs.append(args[i])
+                elif n in kwargs:
+                    callargs.append(kwargs[n])
+            context = Context(None, *callargs)
+
+        with context:
+            return bool(self._apply(*context.args))
 
     def __and__(self, other):
         def AND(*args):
@@ -205,7 +189,8 @@ class Predicate(object):
     def _apply(self, *args):
         # Internal method that is used to invoke the predicate with the
         # proper number of positional arguments, inside the current
-        # invocation context.
+        # invocation context. If the predicate accepts more arguments than
+        # given, the predicate will receive `None` for these extra arguments.
         if self.var_args:
             callargs = args
         elif self.num_args > len(args):
@@ -219,7 +204,7 @@ class Predicate(object):
             result = None if result is None else bool(result)
         except SkipPredicate:
             result = None
-        
+
         logger.debug('  %s = %s', self, 'skipped' if result is None else result)
         return result
 

@@ -1,8 +1,8 @@
 import functools
 import warnings
 
+from rules.context import Context
 from rules.predicates import (
-    NO_VALUE,
     Predicate,
     always_allow,
     always_deny,
@@ -10,6 +10,11 @@ from rules.predicates import (
     always_true,
     predicate,
 )
+
+
+def C(*args, **kwargs):
+    return Context('TESTRULE', *args, **kwargs)
+
 
 def test_always_true():
     assert always_true()
@@ -253,8 +258,8 @@ def test_var_args():
         assert len(args) > 0
         assert len(kwargs) == 0
     assert p.num_args == 0
-    p.test('a')
-    p.test('a', 'b')
+    p.test(C('a'))
+    p.test(C('a', 'b'))
 
 
 def test_no_args():
@@ -263,7 +268,7 @@ def test_no_args():
         assert len(args) == 0
         assert len(kwargs) == 0
     assert p.num_args == 0
-    p.test()
+    p.test(C())
 
 
 def test_one_arg():
@@ -273,7 +278,7 @@ def test_one_arg():
         assert len(kwargs) == 0
         assert a == 'a'
     assert p.num_args == 1
-    p.test('a')
+    p.test(C('a'))
 
 
 def test_two_args():
@@ -284,7 +289,28 @@ def test_two_args():
         assert a == 'a'
         assert b == 'b'
     assert p.num_args == 2
-    p.test('a', 'b')
+    p.test(C('a', 'b'))
+
+
+def test_one_optional_arg():
+    @predicate
+    def p(a, b=None):
+        assert a == 'a'
+        assert b is None
+    assert p.num_args == 2
+    p.test(C('a'))
+    p.test(C('a', None))
+
+
+def test_two_optional_args():
+    @predicate
+    def p(a=None, b=None):
+        assert a is None
+        assert b is None
+    assert p.num_args == 2
+    p.test(C())
+    p.test(C(None))
+    p.test(C(None, None))
 
 
 def test_no_mask():
@@ -292,21 +318,37 @@ def test_no_mask():
     def p(a=None, b=None, *args, **kwargs):
         assert len(args) == 0
         assert len(kwargs) == 1
-        'c' in kwargs
+        assert kwargs['c'] == 'c'
         assert a == 'a'
         assert b == 'b'
     p('a', b='b', c='c')
 
 
-def test_no_value_marker():
-    @predicate
-    def p(a, b=None):
-        assert a == 'a'
-        assert b is None
+def test_predicate_test_deprecation():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert always_false.test() is False
+        assert 'Predicate.test' in str(w[-1].message)
 
-    assert not NO_VALUE
-    p.test('a')
-    p.test('a', NO_VALUE)
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert always_false.test('a') is False
+        assert 'Predicate.test' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert always_false.test('a', 'b') is False
+        assert 'Predicate.test' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert always_false.test('a', target='b') is False
+        assert 'Predicate.test' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        assert always_false.test(obj='a', target='b') is False
+        assert 'Predicate.test' in str(w[-1].message)
 
 
 def test_short_circuit():
@@ -318,12 +360,12 @@ def test_short_circuit():
     def shorted_predicate(self):
         raise Exception('this predicate should not be evaluated')
 
-    assert (always_false & shorted_predicate).test() is False
-    assert (always_true | shorted_predicate).test() is True
+    assert (always_false & shorted_predicate).test(C()) is False
+    assert (always_true | shorted_predicate).test(C()) is True
 
     def raises(pred):
         try:
-            pred.test()
+            pred.test(C())
             return False
         except Exception as e:
             return 'evaluated' in str(e)
@@ -341,8 +383,9 @@ def test_skip_predicate_deprecation():
 
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter('always')
-        assert skipped_predicate.test() is False
-        assert len(w) == 1 and 'deprecated' in str(w[-1].message)
+        assert skipped_predicate._apply() is None
+        assert skipped_predicate.test(C()) is False
+        assert 'SkipPredicate' in str(w[-1].message)
 
 
 def test_skip_predicate():
@@ -354,58 +397,62 @@ def test_skip_predicate():
     def passthrough(a):
         return a
 
-    assert (requires_two_args & passthrough).test(True, True) is True
-    assert (requires_two_args & passthrough).test(True, False) is False
+    assert (requires_two_args & passthrough).test(C(True, True)) is True
+    assert (requires_two_args & passthrough).test(C(True, False)) is False
 
     # because requires_two_args is called with only one argument
     # its result is not taken into account, only the result of the
     # other predicate matters.
-    assert (requires_two_args & passthrough).test(True) is True
-    assert (requires_two_args & passthrough).test(False) is False
-    assert (requires_two_args | passthrough).test(True) is True
-    assert (requires_two_args | passthrough).test(False) is False
+    assert (requires_two_args & passthrough).test(C(True)) is True
+    assert (requires_two_args & passthrough).test(C(False)) is False
+    assert (requires_two_args | passthrough).test(C(True)) is True
+    assert (requires_two_args | passthrough).test(C(False)) is False
 
     # test that order does not matter
-    assert (passthrough & requires_two_args).test(True) is True
-    assert (passthrough & requires_two_args).test(False) is False
-    assert (passthrough | requires_two_args).test(True) is True
-    assert (passthrough | requires_two_args).test(False) is False
+    assert (passthrough & requires_two_args).test(C(True)) is True
+    assert (passthrough & requires_two_args).test(C(False)) is False
+    assert (passthrough | requires_two_args).test(C(True)) is True
+    assert (passthrough | requires_two_args).test(C(False)) is False
 
     # test that inversion does not modify the result
-    assert (~requires_two_args & passthrough).test(True) is True
-    assert (~requires_two_args & passthrough).test(False) is False
-    assert (~requires_two_args | passthrough).test(True) is True
-    assert (~requires_two_args | passthrough).test(False) is False
-    assert (passthrough & ~requires_two_args).test(True) is True
-    assert (passthrough & ~requires_two_args).test(False) is False
-    assert (passthrough | ~requires_two_args).test(True) is True
-    assert (passthrough | ~requires_two_args).test(False) is False
+    assert (~requires_two_args & passthrough).test(C(True)) is True
+    assert (~requires_two_args & passthrough).test(C(False)) is False
+    assert (~requires_two_args | passthrough).test(C(True)) is True
+    assert (~requires_two_args | passthrough).test(C(False)) is False
+    assert (passthrough & ~requires_two_args).test(C(True)) is True
+    assert (passthrough & ~requires_two_args).test(C(False)) is False
+    assert (passthrough | ~requires_two_args).test(C(True)) is True
+    assert (passthrough | ~requires_two_args).test(C(False)) is False
 
     # test that when all predicates are skipped, result is False
-    assert requires_two_args.test(True) is False
-    assert (requires_two_args | requires_two_args).test(True) is False
-    assert (requires_two_args & requires_two_args).test(True) is False
+    assert requires_two_args.test(C(True)) is False
+    assert (requires_two_args | requires_two_args).test(C(True)) is False
+    assert (requires_two_args & requires_two_args).test(C(True)) is False
 
     # test that a skipped predicate doesn't alter the result at all
-    assert (requires_two_args | requires_two_args | passthrough).test(True) is True
-    assert (requires_two_args & requires_two_args & passthrough).test(True) is True
+    assert (requires_two_args | requires_two_args | passthrough).test(C(True)) is True
+    assert (requires_two_args & requires_two_args & passthrough).test(C(True)) is True
 
 
 def test_invocation_context():
     @predicate
     def p1():
         assert id(p1.context) == id(p2.context)
+        assert p1.context.rule == 'TESTRULE'
         assert p1.context.args == ('a',)
+        assert p1.context.kwargs == {'c': 'c'}
         return True
 
     @predicate
     def p2():
         assert id(p1.context) == id(p2.context)
+        assert p2.context.rule == 'TESTRULE'
         assert p2.context.args == ('a',)
+        assert p2.context.kwargs == {'c': 'c'}
         return True
 
     p = p1 & p2
-    assert p.test('a')
+    assert p.test(C('a', c='c'))
     assert p.context is None
 
 
@@ -422,10 +469,10 @@ def test_invocation_context_nested():
 
     @predicate
     def p():
-        assert p1.context.args == ('a',)
-        return p1.test('b1') & p2.test('b2')
+        assert p.context.args == ('a',)
+        return p1.test(C('b1')) and p2.test(C('b2'))
 
-    assert p.test('a')
+    assert p.test(C('a'))
     assert p.context is None
 
 
@@ -440,4 +487,4 @@ def test_invocation_context_storage():
         return p2.context['p1.a'] == a
 
     p = p1 & p2
-    assert p.test('a')
+    assert p.test(C('a'))
