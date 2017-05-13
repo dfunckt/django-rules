@@ -313,8 +313,8 @@ def is_group_member(*groups):
     def fn(user):
         if not hasattr(user, 'groups'):
             return False  # swapped user model, doesn't support groups
-        group_names = set(user.groups.values_list('name', flat=True))
-        user._group_names_cache = group_names  # just in case people were using this
-        return set(groups).issubset(group_names)
+        if not hasattr(user, '_group_names_cache'):  # pragma: no cover
+            user._group_names_cache = set(user.groups.values_list('name', flat=True))
+        return set(groups).issubset(user._group_names_cache)
 
     return fn
