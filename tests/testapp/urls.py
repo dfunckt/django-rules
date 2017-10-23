@@ -8,7 +8,7 @@ from .views import (change_book, delete_book,
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     # Function-based views
     url(r'^(?P<book_id>\d+)/change/$', change_book, name='change_book'),
