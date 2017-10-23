@@ -1,7 +1,10 @@
 from __future__ import absolute_import
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.encoding import force_str
