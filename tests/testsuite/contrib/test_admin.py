@@ -1,5 +1,15 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+try:
+    from django.urls import reverse
+except ImportError:
+    # django < 1.10
+    from django.core.urlresolvers import reverse
+
+try:
+    from django.urls import reverse
+except ImportError:
+    # Django < 2.0
+    from django.core.urlresolvers import reverse
 
 
 class ModelAdminTests(TestCase):

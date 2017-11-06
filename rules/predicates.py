@@ -219,7 +219,7 @@ class Predicate(object):
             result = None if result is None else bool(result)
         except SkipPredicate:
             result = None
-        
+
         logger.debug('  %s = %s', self, 'skipped' if result is None else result)
         return result
 

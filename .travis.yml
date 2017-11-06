@@ -1,13 +1,13 @@
-# ----------------------------------------
+# ---------------------------------------------------------------------------
 # Python support matrix per Django version
 #
 #   2.6   1.5  1.6
 #   2.7   1.5  1.6  1.7  1.8  1.9  1.10  1.11
 #   3.3   1.5  1.6  1.7  1.8
-#   3.4             1.7  1.8  1.9  1.10  1.11
-#   3.5                  1.8  1.9  1.10  1.11
-#   3.6                            1.10  1.11
-# ----------------------------------------
+#   3.4             1.7  1.8  1.9  1.10  1.11  2.0
+#   3.5                  1.8  1.9  1.10  1.11  2.0
+#   3.6                            1.10  1.11  2.0
+# ---------------------------------------------------------------------------
 sudo: false
 language: python
 matrix:
@@ -29,13 +29,16 @@ matrix:
     - { python: 3.4, env: TOXENV=py34-django18 }
     - { python: 3.4, env: TOXENV=py34-django19 }
     - { python: 3.4, env: TOXENV=py34-django110 }
+    - { python: 3.4, env: TOXENV=py34-django20 }
     - { python: 3.4, env: TOXENV=py34-django111 }
     - { python: 3.5, env: TOXENV=py35-django18 }
     - { python: 3.5, env: TOXENV=py35-django19 }
     - { python: 3.5, env: TOXENV=py35-django110 }
     - { python: 3.5, env: TOXENV=py35-django111 }
-    - { python: 3.6, env: TOXENV=py35-django110 }
-    - { python: 3.6, env: TOXENV=py35-django111 }
+    - { python: 3.5, env: TOXENV=py35-django20 }
+    - { python: 3.6, env: TOXENV=py36-django110 }
+    - { python: 3.6, env: TOXENV=py36-django111 }
+    - { python: 3.6, env: TOXENV=py36-django20 }
 install:
   - pip install tox
 script: tox
