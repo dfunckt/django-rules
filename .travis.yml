@@ -1,61 +1,42 @@
-# ----------------------------------------
-# Python support matrix per Django version
-#
-#   2.6   1.5  1.6
-#   2.7   1.5  1.6  1.7  1.8  1.9  1.10
-#   3.3   1.5  1.6  1.7  1.8
-#   3.4             1.7  1.8  1.9  1.10
-#   3.5                  1.8  1.9  1.10
-# ----------------------------------------
 sudo: false
 language: python
-python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "pypy"
-  - "pypy3"
-env:
-  - DJANGO='Django<1.6'  # Django 1.5
-  - DJANGO='Django<1.7'  # Django 1.6
-  - DJANGO='Django<1.8'  # Django 1.7
-  - DJANGO='Django<1.9'  # Django 1.8
-  - DJANGO='Django<1.10' # Django 1.9
-  - DJANGO='Django<1.11' # Django 1.10
 matrix:
-  exclude:
-    - python: "2.6"
-      env: DJANGO='Django<1.8'
-    - python: "2.6"
-      env: DJANGO='Django<1.9'
-    - python: "2.6"
-      env: DJANGO='Django<1.10'
-    - python: "2.6"
-      env: DJANGO='Django<1.11'
-    - python: "3.3"
-      env: DJANGO='Django<1.10'
-    - python: "3.3"
-      env: DJANGO='Django<1.11'
-    - python: "3.4"
-      env: DJANGO='Django<1.6'
-    - python: "3.4"
-      env: DJANGO='Django<1.7'
-    - python: "3.5"
-      env: DJANGO='Django<1.6'
-    - python: "3.5"
-      env: DJANGO='Django<1.7'
-    - python: "3.5"
-      env: DJANGO='Django<1.8'
-    - python: "pypy3"
-      env: DJANGO='Django<1.10'
-    - python: "pypy3"
-      env: DJANGO='Django<1.11'
+  include:
+    - { env: TOXENV=py26-django15, python: 2.6 }
+    - { env: TOXENV=py26-django16, python: 2.6 }
+    - { env: TOXENV=py27-django15, python: 2.7 }
+    - { env: TOXENV=py27-django16, python: 2.7 }
+    - { env: TOXENV=py27-django17, python: 2.7 }
+    - { env: TOXENV=py27-django18, python: 2.7 }
+    - { env: TOXENV=py27-django19, python: 2.7 }
+    - { env: TOXENV=py27-django110, python: 2.7 }
+    - { env: TOXENV=py33-django15, python: 3.3 }
+    - { env: TOXENV=py33-django16, python: 3.3 }
+    - { env: TOXENV=py33-django17, python: 3.3 }
+    - { env: TOXENV=py33-django18, python: 3.3 }
+    - { env: TOXENV=py34-django17, python: 3.4 }
+    - { env: TOXENV=py34-django18, python: 3.4 }
+    - { env: TOXENV=py34-django19, python: 3.4 }
+    - { env: TOXENV=py34-django110, python: 3.4 }
+    - { env: TOXENV=py35-django18, python: 3.5 }
+    - { env: TOXENV=py35-django19, python: 3.5 }
+    - { env: TOXENV=py35-django110, python: 3.5 }
+    - { env: TOXENV=py34-django20, python: 3.4 }
+    - { env: TOXENV=py35-django20, python: 3.5 }
+    - { env: TOXENV=py36-django20, python: 3.6 }
+    - { env: TOXENV=pypy-django15, python: pypy }
+    - { env: TOXENV=pypy-django16, python: pypy }
+    - { env: TOXENV=pypy-django17, python: pypy }
+    - { env: TOXENV=pypy-django18, python: pypy }
+    - { env: TOXENV=pypy-django19, python: pypy }
+    - { env: TOXENV=pypy-django110, python: pypy }
+    - { env: TOXENV=pypy3-django15, python: pypy3-2.4.0 }
+    - { env: TOXENV=pypy3-django16, python: pypy3-2.4.0 }
+    - { env: TOXENV=pypy3-django17, python: pypy3-2.4.0 }
+    - { env: TOXENV=pypy3-django18, python: pypy3.5-5.8.0 }
+    - { env: TOXENV=pypy3-django20, python: pypy3.5-5.8.0 }
 install:
-  - 'pip install "${DJANGO}"'
-  - pip install coveralls
-  - pip install -e .
-script: ./runtests.sh -v
+  - pip install tox
+script: tox
 after_success:
   - coveralls
