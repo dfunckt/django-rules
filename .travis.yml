@@ -34,7 +34,7 @@ matrix:
     # - { env: TOXENV=pypy3-django16, python: pypy3.5-5.8 }
     # - { env: TOXENV=pypy3-django17, python: pypy3.5-5.8 }
     # - { env: TOXENV=pypy3-django18, python: pypy3.5-5.8 }
-    - { env: TOXENV=pypy3-django20, python: pypy3.5-5.8 }
+    - { env: TOXENV=pypy3-django20, python: pypy3.5-5.8.0 }
 install:
   - pip install tox
 script: tox
