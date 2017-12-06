@@ -75,6 +75,8 @@ matrix:
       env: DJANGO='Django<1.10'
     - python: "3.6"
       env: DJANGO='Django<1.11'
+    - python: "pypy"
+      env: DJANGO='Django<2.1'
     - python: "pypy3"
       env: DJANGO='Django<1.6'
     - python: "pypy3"
