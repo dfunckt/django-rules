@@ -24,6 +24,8 @@ env:
   - DJANGO='Django<1.9'  # Django 1.8
   - DJANGO='Django<1.10' # Django 1.9
   - DJANGO='Django<1.11' # Django 1.10
+  - DJANGO='Django<1.12' # Django 1.11
+  - DJANGO='Django<2.1' # Django 2.0
 matrix:
   exclude:
     - python: "2.6"
@@ -34,14 +36,26 @@ matrix:
       env: DJANGO='Django<1.10'
     - python: "2.6"
       env: DJANGO='Django<1.11'
+    - python: "2.6"
+      env: DJANGO='Django<1.12'
+    - python: "2.6"
+      env: DJANGO='Django<2.1'
+    - python: "2.7"
+      env: DJANGO='Django<2.1'
     - python: "3.3"
       env: DJANGO='Django<1.10'
     - python: "3.3"
       env: DJANGO='Django<1.11'
+    - python: "3.3"
+      env: DJANGO='Django<1.12'
+    - python: "3.3"
+      env: DJANGO='Django<2.1'
     - python: "3.4"
       env: DJANGO='Django<1.6'
     - python: "3.4"
       env: DJANGO='Django<1.7'
+    - python: "3.4"
+      env: DJANGO='Django<2.1'
     - python: "3.5"
       env: DJANGO='Django<1.6'
     - python: "3.5"
@@ -49,9 +63,11 @@ matrix:
     - python: "3.5"
       env: DJANGO='Django<1.8'
     - python: "pypy3"
-      env: DJANGO='Django<1.10'
+      env: DJANGO='Django<1.6'
     - python: "pypy3"
-      env: DJANGO='Django<1.11'
+      env: DJANGO='Django<1.7'
+    - python: "pypy3"
+      env: DJANGO='Django<1.8'
 install:
   - 'pip install "${DJANGO}"'
   - pip install coveralls
