@@ -4,6 +4,6 @@ from .predicates import (Predicate, predicate, always_true, always_false,
                          always_allow, always_deny, is_authenticated,
                          is_superuser, is_staff, is_active, is_group_member)
 
-VERSION = (1, 2, 1, 'final', 1)
+VERSION = (1, 3, 0, 'final', 1)
 
 default_app_config = 'rules.apps.RulesConfig'

@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## v1.3.0 - 2017/12/13
+
+- Added support for Django 2.0
+- Added support for Django 1.11 and Python 3.6
+- Dropped support for PyPy and PyPy3
+
 ## v1.2.1 - 2017/05/13
 
 - Reverted "Fixed undesired caching in `is_group_member` factory"
