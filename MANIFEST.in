@@ -1,3 +1,4 @@
+include CHANGELOG.md
 include INSTALL
 include LICENSE
 include README.rst
