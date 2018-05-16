@@ -11,6 +11,7 @@ from rules.predicates import (
     predicate,
 )
 
+
 def test_always_true():
     assert always_true()
 
