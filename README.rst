@@ -267,12 +267,7 @@ We can now update our ``can_edit_book`` rule:
 
 .. code:: python
 
-    >>> rules.add_rule('can_edit_book', is_book_author_or_editor)
-    Traceback (most recent call last):
-        ...
-    KeyError: A rule with name `can_edit_book` already exists
-    >>> rules.remove_rule('can_edit_book')
-    >>> rules.add_rule('can_edit_book', is_book_author_or_editor)
+    >>> rules.update_rule('can_edit_book', is_book_author_or_editor)
     >>> rules.test_rule('can_edit_book', adrian, guidetodjango)
     True
     >>> rules.test_rule('can_delete_book', adrian, guidetodjango)
