@@ -796,7 +796,7 @@ Instance methods
 
 ``update_rule(name)``
     Update the rule with the given name. Raises ``KeyError`` if no rule with
-    that name exist.
+    that name exists.
 
 ``rule_exists(name)``
     Returns ``True`` if a rule with the given name exists, ``False`` otherwise.
