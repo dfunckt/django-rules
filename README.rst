@@ -267,12 +267,7 @@ We can now update our ``can_edit_book`` rule:
 
 .. code:: python
 
-    >>> rules.add_rule('can_edit_book', is_book_author_or_editor)
-    Traceback (most recent call last):
-        ...
-    KeyError: A rule with name `can_edit_book` already exists
-    >>> rules.remove_rule('can_edit_book')
-    >>> rules.add_rule('can_edit_book', is_book_author_or_editor)
+    >>> rules.update_rule('can_edit_book', is_book_author_or_editor)
     >>> rules.test_rule('can_edit_book', adrian, guidetodjango)
     True
     >>> rules.test_rule('can_delete_book', adrian, guidetodjango)
@@ -799,6 +794,10 @@ Instance methods
     Remove the rule with the given name. Raises ``KeyError`` if a rule with
     that name does not exist.
 
+``update_rule(name)``
+    Update the rule with the given name. Raises ``KeyError`` if no rule with
+    that name exists.
+
 ``rule_exists(name)``
     Returns ``True`` if a rule with the given name exists, ``False`` otherwise.
 
@@ -886,6 +885,10 @@ Managing the shared rule set
 ``remove_rule(name)``
     Remove a rule from the shared rule set. See ``RuleSet.remove_rule``.
 
+``update_rule(name)``
+    Update the rule with the given name from the shared rules. Raises ``KeyError`` if no rule with
+    that name exists. See ``RuleSet.update_rule``.
+
 ``rule_exists(name)``
     Returns whether a rule exists in the shared rule set. See
     ``RuleSet.rule_exists``.
@@ -902,6 +905,9 @@ Managing the permissions rule set
 
 ``remove_perm(name)``
     Remove a rule from the permissions rule set. See ``RuleSet.remove_rule``.
+
+``update_perm(name)``
+    Update a rule from the permissions rule set. See ``RuleSet.update_rule``.
 
 ``perm_exists(name)``
     Returns whether a rule exists in the permissions rule set. See

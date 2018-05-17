@@ -12,6 +12,10 @@ def remove_perm(name):
     permissions.remove_rule(name)
 
 
+def update_perm(name, pred):
+    permissions.update_rule(name, pred)
+
+
 def perm_exists(name):
     return permissions.rule_exists(name)
 
