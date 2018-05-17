@@ -32,7 +32,7 @@ def test_shared_ruleset():
     assert test_rule('somerule')
     update_rule('somerule', always_false)
     assert not test_rule('somerule')
-    assert_raises(KeyError, update_rule, 'someoterrule', always_false)
+    assert_raises(KeyError, update_rule, 'someotherrule', always_false)
     remove_rule('somerule')
     assert not rule_exists('somerule')
 
