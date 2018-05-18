@@ -1,3 +1,4 @@
+import sys
 import functools
 import warnings
 
@@ -10,6 +11,10 @@ from rules.predicates import (
     always_true,
     predicate,
 )
+
+if sys.version_info >= (3,):
+    from ._test_predicates_kwonly import *
+
 
 def test_always_true():
     assert always_true()
