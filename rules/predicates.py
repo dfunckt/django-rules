@@ -5,6 +5,8 @@ import threading
 from functools import partial, update_wrapper
 from warnings import warn
 
+from .compat.argspec import getfullargspec
+
 
 logger = logging.getLogger('rules')
 
@@ -56,23 +58,23 @@ class Predicate(object):
         if isinstance(fn, Predicate):
             fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
         elif isinstance(fn, partial):
-            argspec = inspect.getargspec(fn.func)
+            argspec = getfullargspec(fn.func)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - len(fn.args)
             if inspect.ismethod(fn.func):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
         elif inspect.ismethod(fn):
-            argspec = inspect.getargspec(fn)
+            argspec = getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
         elif inspect.isfunction(fn):
-            argspec = inspect.getargspec(fn)
+            argspec = getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args)
         elif isinstance(fn, object):
             callfn = getattr(fn, '__call__')
-            argspec = inspect.getargspec(callfn)
+            argspec = getfullargspec(callfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__
