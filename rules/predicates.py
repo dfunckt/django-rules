@@ -1,12 +1,22 @@
-import inspect
 import logging
 import operator
 import threading
 from functools import partial, update_wrapper
 from warnings import warn
 
+from .compat import inspect
+
 
 logger = logging.getLogger('rules')
+
+
+def assert_has_kwonlydefaults(fn, msg):
+    argspec = inspect.getfullargspec(fn)
+    if hasattr(argspec, 'kwonlyargs'):
+        if not argspec.kwonlyargs:
+            return
+        if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(argspec.kwonlydefaults.keys()):
+            raise TypeError(msg)
 
 
 class SkipPredicate(Exception):
@@ -53,26 +63,29 @@ class Predicate(object):
         #   - fn(obj=None)
         #   - fn()
         assert callable(fn), 'The given predicate is not callable.'
+        innerfn = fn
         if isinstance(fn, Predicate):
             fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
+            innerfn = fn
         elif isinstance(fn, partial):
-            argspec = inspect.getargspec(fn.func)
+            innerfn = fn.func
+            argspec = inspect.getfullargspec(innerfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - len(fn.args)
-            if inspect.ismethod(fn.func):
+            if inspect.ismethod(innerfn):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
         elif inspect.ismethod(fn):
-            argspec = inspect.getargspec(fn)
+            argspec = inspect.getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
         elif inspect.isfunction(fn):
-            argspec = inspect.getargspec(fn)
+            argspec = inspect.getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args)
         elif isinstance(fn, object):
-            callfn = getattr(fn, '__call__')
-            argspec = inspect.getargspec(callfn)
+            innerfn = getattr(fn, '__call__')
+            argspec = inspect.getfullargspec(innerfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__
@@ -81,6 +94,7 @@ class Predicate(object):
             raise TypeError('Incompatible predicate.')
         if bind:
             num_args -= 1
+        assert_has_kwonlydefaults(innerfn, 'The given predicate is missing defaults for keyword-only arguments')
         assert num_args <= 2, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
