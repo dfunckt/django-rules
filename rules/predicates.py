@@ -1,3 +1,4 @@
+import sys
 import inspect
 import logging
 import operator
@@ -9,6 +10,16 @@ from .compat.argspec import getfullargspec
 
 
 logger = logging.getLogger('rules')
+
+
+def _check_kwonly(fn):
+    if sys.version_info <= (3,):
+        return
+    argspec = getfullargspec(fn)
+    if not argspec.kwonlyargs:
+        return
+    if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(argspec.kwonlydefaults.keys()):
+        raise TypeError('The given predicate is missing keyword arguments')
 
 
 class SkipPredicate(Exception):
@@ -56,7 +67,6 @@ class Predicate(object):
         #   - fn()
         assert callable(fn), 'The given predicate is not callable.'
         if isinstance(fn, Predicate):
-            argspec = None
             fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
         elif isinstance(fn, partial):
             argspec = getfullargspec(fn.func)
@@ -65,7 +75,6 @@ class Predicate(object):
             if inspect.ismethod(fn.func):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
-            argspec = getfullargspec(fn)
         elif inspect.ismethod(fn):
             argspec = getfullargspec(fn)
             var_args = argspec.varargs is not None
@@ -85,9 +94,7 @@ class Predicate(object):
             raise TypeError('Incompatible predicate.')
         if bind:
             num_args -= 1
-        if argspec and getattr(argspec, 'kwonlyargs', None):  # Python 2 doesn't have kwonlyargs
-            if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(argspec.kwonlydefaults.keys()):
-                raise TypeError('The given predicate is missing keyword arguments')
+        _check_kwonly(fn)
         assert num_args <= 2, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
