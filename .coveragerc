@@ -1,9 +1,0 @@
-[run]
-source = rules
-
-[report]
-exclude_lines =
-    pragma: no cover
-omit =
-    */python?.?/*
-    */rules/apps.py
