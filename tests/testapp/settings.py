@@ -3,7 +3,6 @@ from os.path import abspath, dirname
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = [
     ('test@example.com', 'Administrator'),
@@ -32,9 +31,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
-# Django < 2.0
-MIDDLEWARE_CLASSES = MIDDLEWARE
-
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -52,6 +48,7 @@ TEMPLATES = [
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',

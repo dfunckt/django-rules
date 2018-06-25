@@ -1,7 +1,6 @@
 #!/bin/sh
-coverage run --source=rules runtests.py --nologcapture --nocapture "$@"
-result=$?
-echo
-coverage report -m
-echo
-exit $result
+
+# NOTE: Make sure you `pip install -e .` first
+coverage run tests/manage.py test --failfast -v2 testsuite "$@" \
+  && echo \
+  && coverage report -m

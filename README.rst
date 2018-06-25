@@ -79,8 +79,8 @@ Table of Contents
 Requirements
 ============
 
-``rules`` requires Python 2.6/3.3 or newer. It can optionally integrate with
-Django, in which case requires Django 1.5 or newer.
+``rules`` requires Python 2.7/3.4 or newer. It can optionally integrate with
+Django, in which case requires Django 1.11 or newer.
 
 
 How to install

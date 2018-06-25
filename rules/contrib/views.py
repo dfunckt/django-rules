@@ -2,18 +2,13 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import mixins
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, FieldError
 from django.shortcuts import get_object_or_404
 from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
-
-try:
-    from django.contrib.auth import mixins
-except ImportError:  # pragma: no cover
-    # Django < 1.9
-    from ..compat import access_mixins as mixins
 
 
 # These are made available for convenience, as well as for use in Django
@@ -124,7 +119,7 @@ def permission_required(perm, fn=None, login_url=None, raise_exception=False, re
             # Get the object to check permissions against
             if callable(fn):
                 obj = fn(request, *args, **kwargs)
-            else:
+            else:  # pragma: no cover
                 obj = fn
 
             # Get the user
