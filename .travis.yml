@@ -8,6 +8,10 @@ python:
   - "pypy"
   - "pypy3"
 
+matrix:
+  include:
+    - {python: "3.6", env: TOXENV=packaging}
+
 install:
   - pip install tox tox-travis tox-venv
   - pip install coveralls
