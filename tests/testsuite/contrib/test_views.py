@@ -15,8 +15,10 @@ from rules.contrib.views import objectgetter
 
 from testapp.models import Book
 
+from . import TestData
 
-class FBVDecoratorTests(TestCase):
+
+class FBVDecoratorTests(TestData, TestCase):
     def test_objectgetter(self):
         request = HttpRequest()
         book = Book.objects.get(pk=1)
@@ -92,7 +94,7 @@ class FBVDecoratorTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class CBVMixinTests(TestCase):
+class CBVMixinTests(TestData, TestCase):
     def test_permission_required_mixin(self):
         # Adrian can change his book
         self.assertTrue(self.client.login(username='adrian', password='secr3t'))

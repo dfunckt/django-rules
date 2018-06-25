@@ -11,8 +11,10 @@ except ImportError:
     # Django < 2.0
     from django.core.urlresolvers import reverse
 
+from . import TestData
 
-class ModelAdminTests(TestCase):
+
+class ModelAdminTests(TestData, TestCase):
     def test_change_book(self):
         # adrian can change his book as its author
         self.assertTrue(self.client.login(username='adrian', password='secr3t'))
