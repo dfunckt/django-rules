@@ -3,13 +3,8 @@ from __future__ import absolute_import
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, Http404
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.encoding import force_str
-
-try:
-    from django.urls import reverse
-except ImportError:
-    # Django < 2.0
-    from django.core.urlresolvers import reverse
 
 from rules.contrib.views import objectgetter
 
