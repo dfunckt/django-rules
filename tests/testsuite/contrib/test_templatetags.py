@@ -4,10 +4,10 @@ from django.test import TestCase
 
 from testapp.models import Book
 
-from . import ISBN
+from . import ISBN, TestData
 
 
-class TemplateTagTests(TestCase):
+class TemplateTagTests(TestData, TestCase):
     tpl_format = """{{% spaceless %}}
         {{% load rules %}}
         {{% {tag} "{name}" user book as can_update %}}
