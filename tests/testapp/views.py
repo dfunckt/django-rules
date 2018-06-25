@@ -56,6 +56,6 @@ class ViewWithPermissionList(LoginRequiredMixin, PermissionRequiredMixin, BookMi
     permission_required = ['testapp.change_book', 'testapp.delete_book']
 
 
-@permission_required('testapp.delete_book', fn=Book.objects.get(pk=1))
+@permission_required('testapp.delete_book', fn=objectgetter(Book, 'book_id'))
 def view_with_object(request, book_id):
     return HttpResponse('OK')
