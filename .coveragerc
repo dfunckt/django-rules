@@ -1,8 +1,9 @@
+[run]
+source = rules
+
 [report]
 exclude_lines =
     pragma: no cover
 omit =
     */python?.?/*
-    */site-packages/nose/*
-    */rules/compat/*
     */rules/apps.py
