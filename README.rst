@@ -649,10 +649,6 @@ You may skip evaluation by returning ``None`` from your predicate:
 Returning ``None`` signifies that the predicate need not be evaluated, thus
 leaving the predicate result up to that point unchanged.
 
-**Note:** This is new in version 1.1.0. It was possible to skip predicates in
-older versions by calling the predicate's ``skip()`` method, but this has been
-deprecated and support will be completely removed in a future version.
-
 
 Logging predicate evaluation
 ----------------------------

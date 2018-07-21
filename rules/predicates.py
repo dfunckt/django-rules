@@ -2,7 +2,6 @@ import logging
 import operator
 import threading
 from functools import partial, update_wrapper
-from warnings import warn
 
 from .compat import inspect
 
@@ -17,17 +16,6 @@ def assert_has_kwonlydefaults(fn, msg):
             return
         if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(argspec.kwonlydefaults.keys()):
             raise TypeError(msg)
-
-
-class SkipPredicate(Exception):
-    """
-    Use to reject usage of a predicate.
-    """
-    def __init__(self, *args, **kwargs):
-        warn('Skipping predicates by raising the SkipPredicate exception '
-             'has been deprecated. Return `None` from your predicate instead.',
-             DeprecationWarning)
-        super(SkipPredicate, self).__init__(*args, **kwargs)
 
 
 class Context(dict):
@@ -155,13 +143,6 @@ class Predicate(object):
         except IndexError:
             return None
 
-    def skip(self):
-        """
-        Use this method in a predicate body to signal that it should be
-        ignored for the current invocation.
-        """
-        raise SkipPredicate()
-
     def test(self, obj=NO_VALUE, target=NO_VALUE):
         """
         The canonical method to invoke predicates.
@@ -228,11 +209,9 @@ class Predicate(object):
             callargs = args[:self.num_args]
         if self.bind:
             callargs = (self,) + callargs
-        try:
-            result = self.fn(*callargs)
-            result = None if result is None else bool(result)
-        except SkipPredicate:
-            result = None
+
+        result = self.fn(*callargs)
+        result = None if result is None else bool(result)
 
         logger.debug('  %s = %s', self, 'skipped' if result is None else result)
         return result

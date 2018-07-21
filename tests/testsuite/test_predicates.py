@@ -1,6 +1,5 @@
 import sys
 import functools
-import warnings
 from unittest import TestCase
 
 from rules.predicates import (
@@ -309,16 +308,6 @@ class PredicateTests(TestCase):
         assert raises(always_false | shorted_predicate)
         assert raises(skipped_predicate & shorted_predicate)
         assert raises(skipped_predicate | shorted_predicate)
-
-    def test_skip_predicate_deprecation(self):
-        @predicate(bind=True)
-        def skipped_predicate(self):
-            self.skip()
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always')
-            assert skipped_predicate.test() is False
-            assert len(w) == 1 and 'deprecated' in str(w[-1].message)
 
     def test_skip_predicate(self):
         @predicate(bind=True)
