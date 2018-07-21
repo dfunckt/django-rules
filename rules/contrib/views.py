@@ -39,10 +39,10 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         ``SingleObjectMixin``. Returns None if there's no ``get_object``
         method.
         """
-        try:
+        if hasattr(self, 'get_object') and callable(self.get_object):
             # Requires SingleObjectMixin or equivalent ``get_object`` method
             return self.get_object()
-        except AttributeError:  # pragma: no cover
+        else:  # pragma: no cover
             return None
 
     def has_permission(self):

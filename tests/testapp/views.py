@@ -14,12 +14,23 @@ class BookMixin(object):
         return Book.objects.get(pk=self.kwargs['book_id'])
 
 
+class BookMixinWithError(object):
+    def get_object(self):
+        raise AttributeError('get_object')
+
+
 @permission_required('testapp.change_book', fn=objectgetter(Book, 'book_id'))
 def change_book(request, book_id):
     return HttpResponse('OK')
 
 
 class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, BookMixin, UpdateView):
+    fields = ['title']
+    template_name = 'empty.html'
+    permission_required = 'testapp.change_book'
+
+
+class BookUpdateErrorView(LoginRequiredMixin, PermissionRequiredMixin, BookMixinWithError, UpdateView):
     fields = ['title']
     template_name = 'empty.html'
     permission_required = 'testapp.change_book'

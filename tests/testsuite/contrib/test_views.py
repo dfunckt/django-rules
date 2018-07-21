@@ -93,6 +93,11 @@ class FBVDecoratorTests(TestCase):
 
 
 class CBVMixinTests(TestCase):
+    def test_get_object_error(self):
+        self.assertTrue(self.client.login(username='adrian', password='secr3t'))
+        with self.assertRaises(AttributeError):
+            self.client.get(reverse('cbv.change_book_error', args=(1,)))
+
     def test_permission_required_mixin(self):
         # Adrian can change his book
         self.assertTrue(self.client.login(username='adrian', password='secr3t'))
