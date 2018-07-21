@@ -40,6 +40,7 @@ matrix:
     - { python: 3.6, env: TOXENV=py36-django111 }
     - { python: 3.6, env: TOXENV=py36-django20 }
 install:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.3 ]]; then pip install virtualenv==15.2.0; fi
   - pip install tox
 script: tox
 after_success:
