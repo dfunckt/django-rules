@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## v1.4.0 - 2018/07/21
+
+- Fixed masking AttributeErrors raised from CBV get_object
+- Fixed compatibility with `inspect` in newer Python 3 versions
+- Added ability to replace rules and permissions
+
 ## v1.3.0 - 2017/12/13
 
 - Added support for Django 2.0
