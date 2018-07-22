@@ -507,11 +507,14 @@ set to also use ``rules`` to authorize any add/change/delete actions in the
 Admin. The Admin asks for *four* different permissions, depending on action:
 
 - ``<app_label>.add_<modelname>``
+- ``<app_label>.view_<modelname>``
 - ``<app_label>.change_<modelname>``
 - ``<app_label>.delete_<modelname>``
 - ``<app_label>``
 
-The first three are obvious. The fourth is the required permission for an app
+*Note:* view permission is new in Django v2.1.
+
+The first four are obvious. The fifth is the required permission for an app
 to be displayed in the Admin's "dashboard". Here's some rules for our
 imaginary ``books`` app as an example:
 
@@ -519,6 +522,7 @@ imaginary ``books`` app as an example:
 
     >>> rules.add_perm('books', rules.always_allow)
     >>> rules.add_perm('books.add_book', is_staff)
+    >>> rules.add_perm('books.view_book', is_staff | has_secret_access_code)
     >>> rules.add_perm('books.change_book', is_staff)
     >>> rules.add_perm('books.delete_book', is_staff)
 
@@ -530,10 +534,9 @@ If you'd like to tell Django whether a user has permissions on a specific
 object, you'd have to override the following methods of a model's
 ``ModelAdmin``:
 
+- ``has_view_permission(user, obj=None)``
 - ``has_change_permission(user, obj=None)``
 - ``has_delete_permission(user, obj=None)``
-
-**Note:** There's also ``has_add_permission(user)`` but is not relevant here.
 
 ``rules`` comes with a custom ``ModelAdmin`` subclass,
 ``rules.contrib.admin.ObjectPermissionsModelAdmin``, that overrides these
@@ -560,6 +563,11 @@ Now this allows you to specify permissions like this:
     >>> rules.add_perm('books.add_book', has_author_profile)
     >>> rules.add_perm('books.change_book', is_book_author_or_editor)
     >>> rules.add_perm('books.delete_book', is_book_author)
+
+To preserve backwards compatibility, Django will ask for either *view* or
+*change* permission. For maximum flexibility, ``rules`` behaves subtly
+different: ``rules`` will ask for the change permission if and only if no rule
+exists for the view permission.
 
 
 Advanced features

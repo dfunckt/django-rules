@@ -1,8 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 
+from ..permissions import perm_exists
 
 class ObjectPermissionsModelAdminMixin(object):
+    def has_view_permission(self, request, obj=None):
+        opts = self.opts
+        codename = get_permission_codename('view', opts)
+        perm = '%s.%s' % (opts.app_label, codename)
+        if perm_exists(perm):
+            return request.user.has_perm(perm, obj)
+        else:
+            return self.has_change_permission(request, obj)
+
     def has_change_permission(self, request, obj=None):
         opts = self.opts
         codename = get_permission_codename('change', opts)

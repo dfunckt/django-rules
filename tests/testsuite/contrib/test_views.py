@@ -114,10 +114,11 @@ class CBVMixinTests(TestData, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(force_str(response.content), 'OK')
 
-        # Martin can *not* delete Adrian's book and is redirected to login
+        # Martin can *not* delete Adrian's book
+        # Up to Django v2.1, the response was a redirect to login
         self.assertTrue(self.client.login(username='martin', password='secr3t'))
         response = self.client.get(reverse('cbv.delete_book', args=(1,)))
-        self.assertEqual(response.status_code, 302)
+        self.assertIn(response.status_code, [302, 403])
 
         # Martin can *not* delete Adrian's book and an PermissionDenied is raised
         self.assertTrue(self.client.login(username='martin', password='secr3t'))
@@ -133,6 +134,7 @@ class CBVMixinTests(TestData, TestCase):
         self.assertEqual(force_str(response.content), 'OK')
 
         # Martin does not have delete permission
+        # Up to Django v2.1, the response was a redirect to login
         self.assertTrue(self.client.login(username='martin', password='secr3t'))
         response = self.client.get(reverse('cbv.view_with_permission_list', args=(1,)))
-        self.assertEqual(response.status_code, 302)
+        self.assertIn(response.status_code, [302, 403])
