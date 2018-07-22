@@ -444,11 +444,9 @@ For more information on the decorator and helper function, refer to the
 Using the class-based view mixin
 ++++++++++++++++++++++++++++++++
 
-Django 1.9 introduced a new set of access mixins that you can use in your
-class-based views to enforce authorization. ``rules`` extends this framework
-to provide a mixin for object-level permissions, ``PermissionRequiredMixin``.
-Note that ``rules`` will seamlessly fall back to importing its own copy of
-Django's access mixins module for versions of Django prior to 1.9.
+Django includes a set of access mixins that you can use in your class-based
+views to enforce authorization. ``rules`` extends this framework to provide
+object-level permissions via a mixin, ``PermissionRequiredMixin``.
 
 The following example will automatically test for permission against the
 instance returned by the view's ``get_object`` method:
@@ -722,9 +720,9 @@ On the other hand, because importing predicates from all over the place in
 order to define rules can lead to circular imports and broken hearts, it's
 best to further split predicates and rules in different modules.
 
-If using Django 1.7 and later, ``rules`` may optionally be configured to
-autodiscover ``rules.py`` modules in your apps and import them at startup. To
-have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
+``rules`` may optionally be configured to autodiscover ``rules.py`` modules in
+your apps and import them at startup. To have ``rules`` do so, just edit your
+``INSTALLED_APPS`` setting:
 
 .. code:: python
 
@@ -734,8 +732,8 @@ have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
     )
 
 **Note:** On Python 2, you must also add the following to the top of your
-``rules.py`` file, or you'll get import errors trying to import
-``django-rules`` itself:
+``rules.py`` file, or you'll get import errors trying to import ``rules``
+itself:
 
 .. code:: python
 
@@ -745,7 +743,8 @@ have ``rules`` do so, just edit your ``INSTALLED_APPS`` setting:
 API Reference
 =============
 
-Everything is accessible from the root ``rules`` module.
+The core APIs are accessible from the root ``rules`` module. Django-specific
+functionality for the Admin and views is available from ``rules.contrib``.
 
 
 Class ``rules.Predicate``
