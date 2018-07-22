@@ -1,6 +1,20 @@
 Changelog
 =========
 
+## v2.0.0 - 2018/07/22
+
+- Removed support for Python 2.6 and 3.3
+- Removed support for Django versions before 1.11
+- Removed ``SkipPredicate`` exception and ``skip`` method of ``Predicate``
+- Removed ``replace_rule`` and related APIs
+- Added ``set_rule`` and related APIs to safely replace a rule without having
+  to ensure one already exists
+- Added compatibility with Django v2.1
+- Re-introduced support for PyPy and PyPy 3
+- Changed Python and Django supported versions policy to exclude end-of-life
+  versions. Support for EOL'd versions will be dropped in minor version
+  updates of ``rules`` from now on.
+
 ## v1.4.0 - 2018/07/21
 
 - Fixed masking AttributeErrors raised from CBV get_object
