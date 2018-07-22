@@ -80,7 +80,7 @@ Requirements
 ``rules`` requires Python 2.7/3.4 or newer. It can optionally integrate with
 Django, in which case requires Django 1.11 or newer.
 
-Note: At any given moment in time, ``rules`` will maintain support for all
+*Note*: At any given moment in time, ``rules`` will maintain support for all
 currently supported Django versions, while dropping support for those versions
 that reached end-of-life in minor releases. See the `Supported Versions`_
 section on Django Project website for the current state and timeline.
@@ -90,6 +90,9 @@ section on Django Project website for the current state and timeline.
 
 Upgrading from 1.x
 ==================
+
+*   Support Python 2.6 and 3.3, and Django versions before 1.11 has been
+    dropped.
 
 *   The ``SkipPredicate`` exception and ``skip()`` method of ``Predicate``,
     that were used to signify that a predicate should be skipped, have been
