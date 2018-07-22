@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from rules.predicates import always_true, always_false
-from rules.permissions import (permissions, add_perm, replace_perm, remove_perm,
+from rules.permissions import (permissions, add_perm, set_perm, remove_perm,
                                perm_exists, has_perm, ObjectPermissionBackend)
 
 
@@ -24,10 +24,8 @@ class PermissionsTests(TestCase):
         assert has_perm('can_edit_book')
         with self.assertRaises(KeyError):
             add_perm('can_edit_book', always_false)
-        replace_perm('can_edit_book', always_false)
+        set_perm('can_edit_book', always_false)
         assert not has_perm('can_edit_book')
-        with self.assertRaises(KeyError):
-            replace_perm('someotherperm', always_false)
         remove_perm('can_edit_book')
         assert not perm_exists('can_edit_book')
 
@@ -41,9 +39,7 @@ class PermissionsTests(TestCase):
         assert backend.has_module_perms(None, 'can_edit_book')
         with self.assertRaises(KeyError):
             add_perm('can_edit_book', always_true)
-        replace_perm('can_edit_book', always_false)
+        set_perm('can_edit_book', always_false)
         assert not backend.has_perm(None, 'can_edit_book')
-        with self.assertRaises(KeyError):
-            replace_perm('someotherperm', always_false)
         remove_perm('can_edit_book')
         assert not perm_exists('can_edit_book')

@@ -8,12 +8,12 @@ def add_perm(name, pred):
     permissions.add_rule(name, pred)
 
 
+def set_perm(name, pred):
+    permissions.set_rule(name, pred)
+
+
 def remove_perm(name):
     permissions.remove_rule(name)
-
-
-def replace_perm(name, pred):
-    permissions.replace_rule(name, pred)
 
 
 def perm_exists(name):

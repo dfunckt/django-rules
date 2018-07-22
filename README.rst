@@ -270,7 +270,7 @@ We can now update our ``can_edit_book`` rule:
 
 .. code:: python
 
-    >>> rules.replace_rule('can_edit_book', is_book_author_or_editor)
+    >>> rules.set_rule('can_edit_book', is_book_author_or_editor)
     >>> rules.test_rule('can_edit_book', adrian, guidetodjango)
     True
     >>> rules.test_rule('can_delete_book', adrian, guidetodjango)
@@ -804,13 +804,12 @@ Instance methods
     Adds a predicate to the rule set, assigning it to the given rule name.
     Raises ``KeyError`` if another rule with that name already exists.
 
+``set_rule(name, predicate)``
+    Set the rule with the given name, regardless if one already exists.
+
 ``remove_rule(name)``
     Remove the rule with the given name. Raises ``KeyError`` if a rule with
     that name does not exist.
-
-``replace_rule(name, predicate)``
-    Update the rule with the given name. Raises ``KeyError`` if no rule with
-    that name exists.
 
 ``rule_exists(name)``
     Returns ``True`` if a rule with the given name exists, ``False`` otherwise.
@@ -896,12 +895,12 @@ Managing the shared rule set
 ``add_rule(name, predicate)``
     Adds a rule to the shared rule set. See ``RuleSet.add_rule``.
 
+``set_rule(name, predicate)``
+    Set the rule with the given name from the shared rule set. See
+    ``RuleSet.set_rule``.
+
 ``remove_rule(name)``
     Remove a rule from the shared rule set. See ``RuleSet.remove_rule``.
-
-``replace_rule(name, predicate)``
-    Replace the rule with the given name from the shared rules. Raises ``KeyError``
-    if no rule with that name exists. See ``RuleSet.replace_rule``.
 
 ``rule_exists(name)``
     Returns whether a rule exists in the shared rule set. See
@@ -917,11 +916,11 @@ Managing the permissions rule set
 ``add_perm(name, predicate)``
     Adds a rule to the permissions rule set. See ``RuleSet.add_rule``.
 
+``set_perm(name, predicate)``
+    Replace a rule from the permissions rule set. See ``RuleSet.set_rule``.
+
 ``remove_perm(name)``
     Remove a rule from the permissions rule set. See ``RuleSet.remove_rule``.
-
-``replace_perm(name, predicate)``
-    Replace a rule from the permissions rule set. See ``RuleSet.replace_rule``.
 
 ``perm_exists(name)``
     Returns whether a rule exists in the permissions rule set. See

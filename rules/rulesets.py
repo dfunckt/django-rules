@@ -13,13 +13,11 @@ class RuleSet(dict):
             raise KeyError('A rule with name `%s` already exists' % name)
         self[name] = pred
 
+    def set_rule(self, name, pred):
+        self[name] = pred
+
     def remove_rule(self, name):
         del self[name]
-
-    def replace_rule(self, name, pred):
-        if name not in self:
-            raise KeyError('No rule with name `%s` exists' % name)
-        self[name] = pred
 
     def __setitem__(self, name, pred):
         fn = predicate(pred)
@@ -35,12 +33,12 @@ def add_rule(name, pred):
     default_rules.add_rule(name, pred)
 
 
+def set_rule(name, pred):
+    default_rules.set_rule(name, pred)
+
+
 def remove_rule(name):
     default_rules.remove_rule(name)
-
-
-def replace_rule(name, pred):
-    default_rules.replace_rule(name, pred)
 
 
 def rule_exists(name):
