@@ -43,6 +43,7 @@ Table of Contents
 =================
 
 - `Requirements`_
+- `Upgrading from 1.x`_
 - `How to install`_
 
   - `Configuring Django`_
@@ -78,6 +79,21 @@ Requirements
 
 ``rules`` requires Python 2.7/3.4 or newer. It can optionally integrate with
 Django, in which case requires Django 1.11 or newer.
+
+Upgrading from 1.x
+==================
+
+*   The ``SkipPredicate`` exception and ``skip()`` method of ``Predicate``,
+    that were used to signify that a predicate should be skipped, have been
+    removed. You may return ``None`` from your predicate to achieve this.
+
+*   The APIs to replace a rule's predicate have been renamed and their
+    behaviour changed. ``replace_rule`` and ``replace_perm`` functions and
+    ``replace_rule`` method of ``RuleSet`` have been renamed to ``set_rule``,
+    ``set_perm`` and ``RuleSet.set_perm`` respectively. The old behaviour was
+    to raise a ``KeyError`` if a rule by the given name did not exist. Since
+    version 2.0 this has changed and you can safely use ``set_*`` to set a
+    rule's predicate without having to ensure the rule exists first.
 
 
 How to install
