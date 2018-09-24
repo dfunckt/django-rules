@@ -13,6 +13,8 @@ from django.utils.encoding import force_text
 
 # These are made available for convenience, as well as for use in Django
 # versions before 1.9. For usage help see Django's docs for 1.9 or later.
+from django.views.generic.edit import BaseCreateView
+
 LoginRequiredMixin = mixins.LoginRequiredMixin
 UserPassesTestMixin = mixins.UserPassesTestMixin
 
@@ -34,11 +36,12 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         ``SingleObjectMixin``. Returns None if there's no ``get_object``
         method.
         """
-        if hasattr(self, 'get_object') and callable(self.get_object):
-            # Requires SingleObjectMixin or equivalent ``get_object`` method
-            return self.get_object()
-        else:  # pragma: no cover
-            return None
+        if not isinstance(self, BaseCreateView):
+            # We do NOT want to call get_object in a BaseCreateView, see issue #85
+            if hasattr(self, 'get_object') and callable(self.get_object):
+                # Requires SingleObjectMixin or equivalent ``get_object`` method
+                return self.get_object()
+        return None
 
     def has_permission(self):
         obj = self.get_permission_object()
