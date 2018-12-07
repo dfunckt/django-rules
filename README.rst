@@ -1,5 +1,5 @@
-django-rules
-^^^^^^^^^^^^
+rules
+^^^^^
 
 ``rules`` is a tiny but powerful app providing object-level permissions to
 Django, without requiring a database. At its core, it is a generic framework

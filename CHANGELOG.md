@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.0.1 - 2018/12/07
+
+- Fixed issue with using ``rules`` in ``CreateView`` CBV
+
 ## v2.0.0 - 2018/07/22
 
 - Removed support for Python 2.6 and 3.3
