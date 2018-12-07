@@ -2,9 +2,9 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from .views import (change_book, delete_book,
-    view_that_raises, view_with_object, view_with_permission_list,
-    BookUpdateView, BookDeleteView, ViewThatRaises, ViewWithPermissionList,
-    BookUpdateErrorView)
+                    view_that_raises, view_with_object, view_with_permission_list,
+                    BookUpdateView, BookDeleteView, ViewThatRaises, ViewWithPermissionList,
+                    BookUpdateErrorView, BookCreateView)
 
 admin.autodiscover()
 
@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^(?P<book_id>\d+)/list/$', view_with_permission_list, name='view_with_permission_list'),
 
     # Class-based views
+    url(r'^cbv/create/$', BookCreateView.as_view(), name='cbv.create_book'),
     url(r'^cbv/(?P<book_id>\d+)/change/$', BookUpdateView.as_view(), name='cbv.change_book'),
     url(r'^cbv/(?P<book_id>\d+)/delete/$', BookDeleteView.as_view(), name='cbv.delete_book'),
     url(r'^cbv/(?P<book_id>\d+)/raise/$', ViewThatRaises.as_view(), name='cbv.view_that_raises'),

@@ -12,14 +12,18 @@ def is_book_author(user, book):
     return book.author == user
 
 
-is_editor = rules.is_group_member('editors')
+@rules.predicate
+def is_boss(user):
+    return user.is_superuser
 
+
+is_editor = rules.is_group_member('editors')
 
 # Rules
 
 rules.add_rule('change_book', is_book_author | is_editor)
 rules.add_rule('delete_book', is_book_author)
-
+rules.add_rule('create_book', is_boss)
 
 # Permissions
 

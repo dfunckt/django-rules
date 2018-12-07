@@ -53,6 +53,11 @@ class FBVDecoratorTests(TestData, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(force_str(response.content), 'OK')
 
+        # Martin can *not* create a book
+        self.assertTrue(self.client.login(username='martin', password='secr3t'))
+        response = self.client.get(reverse('cbv.create_book'))
+        self.assertEqual(response.status_code, 302)
+
         # Martin can *not* delete Adrian's book and is redirected to login
         self.assertTrue(self.client.login(username='martin', password='secr3t'))
         response = self.client.get(reverse('delete_book', args=(1,)))

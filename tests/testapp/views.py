@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.http import HttpResponse
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView, CreateView
 
 from rules.contrib.views import permission_required, objectgetter
 from rules.contrib.views import LoginRequiredMixin, PermissionRequiredMixin
@@ -22,6 +22,13 @@ class BookMixinWithError(object):
 @permission_required('testapp.change_book', fn=objectgetter(Book, 'book_id'))
 def change_book(request, book_id):
     return HttpResponse('OK')
+
+
+
+class BookCreateView(LoginRequiredMixin, PermissionRequiredMixin, BookMixin, CreateView):
+    fields = ['title']
+    template_name = 'empty.html'
+    permission_required = 'testapp.create_book'
 
 
 class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, BookMixin, UpdateView):
