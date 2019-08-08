@@ -57,9 +57,10 @@ Table of Contents
 - `Using Rules with Django`_
 
   - `Permissions`_
-  - `Rules and permissions in views`_
-  - `Rules and permissions in templates`_
-  - `Rules and permissions in the Admin`_
+  - `Permissions in models`_
+  - `Permissions in views`_
+  - `Permissions and rules in templates`_
+  - `Permissions in the Admin`_
 
 - `Advanced features`_
 
@@ -399,8 +400,71 @@ Now, checking again gives ``adrian`` the required permissions:
     False
 
 
-Rules and permissions in views
-------------------------------
+Permissions in models
+---------------------
+
+**NOTE:** The features described in this section work on Python 3+ only.
+
+It is common to have a set of permissions for a model, like what Django offers with
+its default model permissions (such as *add*, *change* etc.). When using ``rules``
+as the permission checking backend, you can declare object-level permissions for
+any model in a similar way, using a new ``Meta`` option.
+
+First, you need to switch your model's base and metaclass to the slightly extended
+versions provided in ``rules.contrib.models``. There are several classes and mixins
+you can use, depending on whether you're already using a custom base and/or metaclass
+for your models or not. The extensions are very slim and don't affect the models'
+behavior in any way other than making it register permissions.
+
+* If you're using the stock ``django.db.models.Model`` as base for your models,
+  simply switch over to ``RulesModel`` and you're good to go.
+
+* If you already have a custom base class adding common functionality to your models,
+  add ``RulesModelMixin`` to the classes it inherits from and set ``RulesModelBase``
+  as its metaclass, like so::
+
+      from django.db.models import Model
+      from rules.contrib.models import RulesModelBase, RulesModelMixin
+
+      class MyModel(RulesModelMixin, Model, metaclass=RulesModelBase):
+          ...
+
+* If you're using a custom metaclass for your models, you'll already know how to
+  make it inherit from ``RulesModelBaseMixin`` yourself.
+
+Then, create your models like so, assuming you're using ``RulesModel`` as base
+directly::
+
+    import rules
+    from rules.contrib.models import RulesModel
+
+    class Book(RulesModel):
+        class Meta:
+            rules_permissions = {
+                "add": rules.is_staff,
+                "read": rules.is_authenticated,
+            }
+
+This would be equivalent to the following calls::
+
+    rules.add_perm("app_label.add_book", rules.is_staff)
+    rules.add_perm("app_label.read_book", rules.is_authenticated)
+
+There are methods in ``RulesModelMixin`` that you can overwrite in order to customize
+how a model's permissions are registered. See the documented source code for details
+if you need this.
+
+Of special interest is the ``get_perm`` classmethod of ``RulesModelMixin``, which can
+be used to convert a permission type to the corresponding full permission name. If
+you need to query for some type of permission on a given model programmatically,
+this is handy::
+
+    if user.has_perm(Book.get_perm("read")):
+        ...
+
+
+Permissions in views
+--------------------
 
 ``rules`` comes with a set of view decorators to help you enforce
 authorization in your views.
@@ -472,7 +536,8 @@ For more information refer to the `Django documentation`_ and the
 
 .. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
 
-Rules and permissions in templates
+
+Permissions and rules in templates
 ----------------------------------
 
 ``rules`` comes with two template tags to allow you to test for rules and
@@ -502,8 +567,8 @@ Then, in your template::
     {% endif %}
 
 
-Rules and permissions in the Admin
-----------------------------------
+Permissions in the Admin
+------------------------
 
 If you've setup ``rules`` to be used with permissions in Django, you're almost
 set to also use ``rules`` to authorize any add/change/delete actions in the
