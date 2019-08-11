@@ -6,7 +6,6 @@ from django.contrib.auth import mixins
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, FieldError
 from django.shortcuts import get_object_or_404
-from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
 
@@ -14,6 +13,8 @@ from django.utils.encoding import force_text
 # These are made available for convenience, as well as for use in Django
 # versions before 1.9. For usage help see Django's docs for 1.9 or later.
 from django.views.generic.edit import BaseCreateView
+
+from rules.compat.six import string_types, wraps
 
 LoginRequiredMixin = mixins.LoginRequiredMixin
 UserPassesTestMixin = mixins.UserPassesTestMixin
@@ -111,10 +112,10 @@ def permission_required(perm, fn=None, login_url=None, raise_exception=False, re
     used.
     """
     def decorator(view_func):
-        @wraps(view_func, assigned=available_attrs(view_func))
+        @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             # Normalize to a list of permissions
-            if isinstance(perm, six.string_types):
+            if isinstance(perm, string_types):
                 perms = (perm,)
             else:
                 perms = perm
