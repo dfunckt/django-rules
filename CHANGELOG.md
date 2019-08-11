@@ -1,6 +1,16 @@
 Changelog
 =========
 
+## v2.1.0 - 2019/08/11
+
+- Added ability to automatically check for permissions in Drango Rest Framework
+  viewsets.
+- Added ability to automatically check for permissions in Drango class-based
+  views.
+- Added ability to automatically register permissions for models.
+- Added shim for "six" in anticipation for Django 3.0 dropping support for
+  Python 2 and removing "six" from its codebase.
+
 ## v2.0.1 - 2018/12/07
 
 - Fixed issue with using ``rules`` in ``CreateView`` CBV
