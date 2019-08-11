@@ -61,6 +61,7 @@ Table of Contents
   - `Permissions in views`_
   - `Permissions and rules in templates`_
   - `Permissions in the Admin`_
+  - `Permissions in Django Rest Framework`_
 
 - `Advanced features`_
 
@@ -536,6 +537,32 @@ For more information refer to the `Django documentation`_ and the
 
 .. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
 
+Checking permission automatically based on view type
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+If you use the mechanisms provided by ``rules.contrib.models`` to register permissions
+for your models as described in `Permissions in models`_, there's another convenient
+mixin for class-based views available for you.
+
+``rules.contrib.views.AutoPermissionRequiredMixin`` can recognize the type of view
+it's used with and check for the corresponding permission automatically.
+
+This example view would, without any further configuration, automatically check for
+the ``"posts.change_post"`` permission, given that the app label is ``"posts"``::
+
+    from django.views.generic import UpdateView
+    from rules.contrib.views import AutoPermissionRequiredMixin
+    from posts.models import Post
+
+    class UpdatePostView(AutoPermissionRequiredMixin, UpdateView):
+        model = Post
+
+By default, the generic CRUD views from ``django.views.generic`` are mapped to the
+native Django permission types (*add*, *change*, *delete* and *view*). However,
+the pre-defined mappings can be extended, changed or replaced altogether when
+subclassing ``AutoPermissionRequiredMixin``. See the fully documented source code
+for details on how to do that properly.
+
 
 Permissions and rules in templates
 ----------------------------------
@@ -636,6 +663,42 @@ To preserve backwards compatibility, Django will ask for either *view* or
 *change* permission. For maximum flexibility, ``rules`` behaves subtly
 different: ``rules`` will ask for the change permission if and only if no rule
 exists for the view permission.
+
+
+Permissions in Django Rest Framework
+------------------------------------
+
+Similar to ``rules.contrib.views.AutoPermissionRequiredMixin``, there is a
+``rules.contrib.rest_framework.AutoPermissionViewSetMixin`` for viewsets in Django
+Rest Framework. The difference is that it doesn't derive permission from the type
+of view but from the API action (*create*, *retrieve* etc.) that's tried to be
+performed. Of course, it requires you to use the mixins from ``rules.contrib.models``
+when declaring models the API should operate on.
+
+Here is a possible ``ModelViewSet`` for the ``Post`` model with fully automated CRUD
+permission checking::
+
+    from rest_framework.serializers import ModelSerializer
+    from rest_framework.viewsets import ModelViewSet
+    from rules.contrib.rest_framework import AutoPermissionViewSetMixin
+    from posts.models import Post
+
+    class PostSerializer(ModelSerializer):
+        class Meta:
+            model = Post
+            fields = "__all__"
+
+    class PostViewSet(AutoPermissionViewSetMixin, ModelViewSet):
+        queryset = Post.objects.all()
+        serializer_class = PostSerializer
+
+By default, the CRUD actions of ``ModelViewSet`` are mapped to the native
+Django permission types (*add*, *change*, *delete* and *view*). The ``list``
+action has no permission checking enabled. However, the pre-defined mappings
+can be extended, changed or replaced altogether when using (or subclassing)
+``AutoPermissionViewSetMixin``. Custom API actions defined via the ``@action``
+decorator may then be mapped as well. See the fully documented source code for
+details on how to properly customize the default behaviour.
 
 
 Advanced features

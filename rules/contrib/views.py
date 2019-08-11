@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied, ImproperlyConfigured, Field
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 
 # These are made available for convenience, as well as for use in Django
@@ -48,6 +49,85 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         obj = self.get_permission_object()
         perms = self.get_permission_required()
         return self.request.user.has_perms(perms, obj)
+
+
+class AutoPermissionRequiredMixin(PermissionRequiredMixin):
+    """
+    An extended variant of PermissionRequiredMixin which automatically determines
+    the permission to check based on the type of view it's used with.
+
+    It works by checking the current view for being an instance of a pre-defined
+    list of view types. On a match, the corresponding permission type (such as
+    "add" or "change") is converted into the full model-specific permission name
+    and checked. See the permission_type_map attribute for the default view type ->
+    permission type mappings.
+
+    When a view using this mixin has an attribute ``permission_type``, that type
+    is used directly and overwrites the permission_type_map for the particular
+    view. A permission type of ``None`` (either as ``permission_type`` or in
+    ``permission_type_map``) causes permission checking to be skipped. If the type
+    of permission to check for should depend on dynamic factors other than the view
+    type, you may overwrite the ``permission_type`` attribute with a ``@property``.
+
+    The ``permission_required`` attribute behaves like it does in
+    ``PermissionRequiredMixin`` and can be used to specify concrete permission name(s)
+    to be checked in addition to the automatically derived one.
+
+    NOTE: The model-based permission registration from ``rules.contrib.models``
+    must be used with the models for which you create views using this mixin,
+    because the permission names are derived via ``RulesModelMixin.get_perm()``
+    internally. The second requirement is the presence of either an attribute
+    ``model`` holding the ``Model`` the view acts on, or the ``get_queryset()``
+    method as provided by Django's ``SingleObjectMixin``. Hence with the normal
+    model views, you don't need to care about anything.
+    """
+
+    # These reflect Django's default model permissions. If needed, this list can be
+    # extended or replaced entirely when subclassing, like so:
+    # permission_type_map = [
+    #     (SomeCustomViewType, "add"),
+    #     (SomeOtherCustomViewType, "some_fancy_action"),
+    #     *AutoPermissionRequiredMixin.permission_type_map,
+    # ]
+    # Note that ordering matters, which is why this is a list and not a dict. The
+    # first entry for which isinstance(self, view_type) returns True will be used.
+    permission_type_map = [
+        (CreateView, "add"),
+        (UpdateView, "change"),
+        (DeleteView, "delete"),
+        (DetailView, "view"),
+    ]
+
+    def get_permission_required(self):
+        """Adds the correct permission to check according to view type."""
+        try:
+            perm_type = self.permission_type
+        except AttributeError:
+            # Perform auto-detection by view type
+            for view_type, _perm_type in self.permission_type_map:
+                if isinstance(self, view_type):
+                    perm_type = _perm_type
+                    break
+            else:
+                raise ImproperlyConfigured(
+                    "AutoPermissionRequiredMixin was used, but permission_type was "
+                    "neither set nor could be determined automatically for {0}. "
+                    "Consider setting permission_type on the view manually or "
+                    "adding {0} to the permission_type_map."
+                    .format(self.__class__.__name__)
+                )
+
+        perms = []
+        if perm_type is not None:
+            model = getattr(self, "model", None)
+            if model is None:
+                model = self.get_queryset().model
+            perms.append(model.get_perm(perm_type))
+
+        # If additional permissions have been defined, consider them as well
+        if self.permission_required is not None:
+            perms.extend(super().get_permission_required())
+        return perms
 
 
 def objectgetter(model, attr_name='pk', field_name='pk'):
