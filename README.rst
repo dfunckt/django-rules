@@ -672,8 +672,8 @@ Similar to ``rules.contrib.views.AutoPermissionRequiredMixin``, there is a
 ``rules.contrib.rest_framework.AutoPermissionViewSetMixin`` for viewsets in Django
 Rest Framework. The difference is that it doesn't derive permission from the type
 of view but from the API action (*create*, *retrieve* etc.) that's tried to be
-performed. Of course, it requires you to use the mixins from ``rules.contrib.models``
-when declaring models the API should operate on.
+performed. Of course, it also requires you to declare your models as described in
+`Permissions in models`_.
 
 Here is a possible ``ModelViewSet`` for the ``Post`` model with fully automated CRUD
 permission checking::
@@ -698,7 +698,7 @@ action has no permission checking enabled. However, the pre-defined mappings
 can be extended, changed or replaced altogether when using (or subclassing)
 ``AutoPermissionViewSetMixin``. Custom API actions defined via the ``@action``
 decorator may then be mapped as well. See the fully documented source code for
-details on how to properly customize the default behaviour.
+details on how to properly customize the default behavior.
 
 
 Advanced features
