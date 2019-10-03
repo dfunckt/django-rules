@@ -607,11 +607,11 @@ Admin. The Admin asks for *four* different permissions, depending on action:
 - ``<app_label>.delete_<modelname>``
 - ``<app_label>``
 
-*Note:* view permission is new in Django v2.1.
+*Note:* view permission is new in Django v2.1 and should not be added in versions before that. 
 
 The first four are obvious. The fifth is the required permission for an app
-to be displayed in the Admin's "dashboard". Here's some rules for our
-imaginary ``books`` app as an example:
+to be displayed in the Admin's "dashboard". Overriding it does not restrict access to the add, 
+change or delete views. Here's some rules for our imaginary ``books`` app as an example:
 
 .. code:: python
 
