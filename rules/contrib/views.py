@@ -1,4 +1,5 @@
 from functools import wraps
+from rest_framework.generics import CreateAPIView, ListAPIView
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -38,7 +39,7 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         ``SingleObjectMixin``. Returns None if there's no ``get_object``
         method.
         """
-        if not isinstance(self, BaseCreateView):
+        if not isinstance(self, (BaseCreateView, CreateAPIView, ListAPIView)):
             # We do NOT want to call get_object in a BaseCreateView, see issue #85
             if hasattr(self, 'get_object') and callable(self.get_object):
                 # Requires SingleObjectMixin or equivalent ``get_object`` method
