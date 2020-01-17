@@ -93,7 +93,7 @@ section on Django Project website for the current state and timeline.
 Upgrading from 1.x
 ==================
 
-*   Support Python 2.6 and 3.3, and Django versions before 1.11 has been
+*   Support for Python 2.6 and 3.3, and Django versions before 1.11 has been
     dropped.
 
 *   The ``SkipPredicate`` exception and ``skip()`` method of ``Predicate``,
