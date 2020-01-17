@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.2.0 - 2020/01/17
+
+- Added compatibility with Django v3.0
+
 ## v2.1.0 - 2019/08/11
 
 - Added ability to automatically check for permissions in Drango Rest Framework
