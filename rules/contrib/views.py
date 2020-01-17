@@ -6,7 +6,6 @@ from django.contrib.auth import mixins
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, FieldError
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
