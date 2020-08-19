@@ -1,3 +1,5 @@
+import sys
+
 from django.contrib.auth.models import User, Group
 from testapp.models import Book
 
@@ -28,3 +30,9 @@ class TestData:
             isbn=ISBN,
             title='The Definitive Guide to Django',
             author=adrian)
+
+        if sys.version_info.major >= 3:
+            from testapp.models import Car
+            Car.objects.create(
+                owner=adrian
+            )

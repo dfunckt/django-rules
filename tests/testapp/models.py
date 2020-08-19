@@ -4,6 +4,7 @@ import sys
 
 from django.conf import settings
 from django.db import models
+from django.contrib.auth import get_user_model
 
 try:
     from django.utils.encoding import python_2_unicode_compatible
@@ -29,8 +30,22 @@ if sys.version_info.major >= 3:
 
     class TestModel(RulesModel):
         class Meta:
-            rules_permissions = {"add": rules.always_true, "view": rules.always_true}
+            rules_permissions = {"add": rules.always_true, "view": rules.always_true }
 
         @classmethod
         def preprocess_rules_permissions(cls, perms):
             perms["custom"] = rules.always_true
+
+
+    @rules.predicate
+    def is_car_owner(user, car):
+        return car.owner == user
+
+    class Car(RulesModel):
+        owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+        class Meta:
+            rules_permissions = {"wash": rules.always_allow,
+                                 "drive": is_car_owner,
+                                 "crash": rules.always_deny }
+

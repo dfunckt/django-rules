@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import sys
+
 from django.http import HttpResponse
 from django.views.generic.edit import UpdateView, DeleteView, CreateView
 
@@ -77,3 +79,47 @@ class ViewWithPermissionList(LoginRequiredMixin, PermissionRequiredMixin, BookMi
 @permission_required('testapp.delete_book', fn=objectgetter(Book, 'book_id'))
 def view_with_object(request, book_id):
     return HttpResponse('OK')
+
+if sys.version_info.major >= 3:
+    from .models import Car
+    @Car.object_permission_required('wash', pk='car_id')
+    def wash_car(request, car_id):
+        return HttpResponse('OK')
+
+    @Car.object_permission_required('drive', pk='car_id')
+    def drive_car(request, car_id):
+        return HttpResponse('OK')
+
+    @Car.object_permission_required('crash', pk='car_id', raise_exception=True)
+    def crash_car(request, car_id):
+        return HttpResponse('OK')
+
+    @Car.object_permission_required(['wash', 'drive'], pk='car_id')
+    def car_view_with_permission_list(request, car_id):
+        return HttpResponse('OK')
+
+    # Permissions on entire class
+    @Car.permission_required('wash')
+    def wash(request):
+        return HttpResponse('OK')
+
+    @Car.permission_required('crash', raise_exception=True)
+    def crash(request):
+        return HttpResponse('OK')
+
+    @Car.permission_required(['wash', 'drive'])
+    def car_view_with_permission_list_for_class(request):
+        return HttpResponse('OK')
+
+    # Testing default pk=id
+    @Car.object_permission_required('wash')
+    def wash_car_default(request, id):
+        return HttpResponse('OK')
+
+    @Car.object_permission_required('drive')
+    def drive_car_default(request, id):
+        return HttpResponse('OK')
+
+    @Car.object_permission_required('crash', raise_exception=True)
+    def crash_car_default(request, id):
+        return HttpResponse('OK')
