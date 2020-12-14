@@ -9,19 +9,19 @@ class ObjectPermissionsModelAdminMixin(object):
         codename = get_permission_codename('view', opts)
         perm = '%s.%s' % (opts.app_label, codename)
         if perm_exists(perm):
-            return request.user.has_perm(perm, obj)
+            return request.user.has_perm(perm, obj, request=request)
         else:
             return self.has_change_permission(request, obj)
 
     def has_change_permission(self, request, obj=None):
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
+        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj, request=request)
 
     def has_delete_permission(self, request, obj=None):
         opts = self.opts
         codename = get_permission_codename('delete', opts)
-        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
+        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj, request=request)
 
 
 class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
@@ -33,7 +33,7 @@ class ObjectPermissionsInlineModelAdminMixin(ObjectPermissionsModelAdminMixin):
                     opts = field.rel.to._meta
                     break
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj)
+        return request.user.has_perm('%s.%s' % (opts.app_label, codename), obj, request=request)
 
     def has_delete_permission(self, request, obj=None):  # pragma: no cover
         if self.opts.auto_created:
