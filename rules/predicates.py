@@ -142,11 +142,11 @@ class Predicate(object):
         except IndexError:
             return None
 
-    def test(self, obj=NO_VALUE, target=NO_VALUE):
+    def test(self, obj=NO_VALUE, target=NO_VALUE, request=NO_VALUE):
         """
         The canonical method to invoke predicates.
         """
-        args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
+        args = tuple(arg for arg in (obj, target, request) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
         logger.debug('Testing %s', self)
         try:
