@@ -5,7 +5,6 @@ from functools import partial, update_wrapper
 
 from .compat import inspect
 
-
 logger = logging.getLogger('rules')
 
 
@@ -83,7 +82,7 @@ class Predicate(object):
         if bind:
             num_args -= 1
         assert_has_kwonlydefaults(innerfn, 'The given predicate is missing defaults for keyword-only arguments')
-        assert num_args <= 2, 'Incompatible predicate.'
+        assert num_args <= 3, 'Incompatible predicate.'
         self.fn = fn
         self.num_args = num_args
         self.var_args = var_args
@@ -143,11 +142,11 @@ class Predicate(object):
         except IndexError:
             return None
 
-    def test(self, obj=NO_VALUE, target=NO_VALUE):
+    def test(self, obj=NO_VALUE, target=NO_VALUE, request=NO_VALUE):
         """
         The canonical method to invoke predicates.
         """
-        args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
+        args = tuple(arg for arg in (obj, target, request) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
         logger.debug('Testing %s', self)
         try:
