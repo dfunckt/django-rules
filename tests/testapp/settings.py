@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.sessions',
-    'rules',
+    # [Best practices] replace 'rules' with:
+    'rules.apps.AutodiscoverRulesConfig',
     'testapp',
 ]
 
