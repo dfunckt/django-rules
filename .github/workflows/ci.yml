@@ -11,7 +11,6 @@ jobs:
     name: Python ${{ matrix.python-version }} (${{ matrix.toxenv }})
     runs-on: ubuntu-latest
 
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
@@ -50,15 +49,21 @@ jobs:
 
     - name: Run tox targets for Python ${{ matrix.python-version }}
       if: ${{ matrix.toxenv == 'py' }}
+      continue-on-error: ${{ matrix.experimental }}
       run: tox --py current
+
     - name: Run '${{ matrix.toxenv }}' tox targets
       if: ${{ matrix.toxenv != 'py' && matrix.toxenv != 'PyPy' }}
+      continue-on-error: ${{ matrix.experimental }}
       run: tox -e ${{ matrix.toxenv }}
+
     - name: Run tox targets for Python ${{ matrix.python-version }}
       if: ${{ matrix.toxenv == 'PyPy' }}
+      continue-on-error: ${{ matrix.experimental }}
       run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
 
     - name: Upload coverage data to coveralls.io
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
@@ -72,6 +77,7 @@ jobs:
     container: python:3-slim
     steps:
     - name: Finalize publishing to coveralls.io
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
