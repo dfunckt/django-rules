@@ -8,15 +8,22 @@ on:
 
 jobs:
   tests:
-    name: Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python-version }} (${{ matrix.toxenv }})
     runs-on: ubuntu-latest
 
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
+        experimental: [false]
+        toxenv: ["py"]
         include:
-          - python-version: "3.8"
+          - python-version: "3.x"
             toxenv: "packaging"
+            experimental: false
+          - python-version: "3.x"
+            toxenv: "djangomain"
+            experimental: true
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +46,11 @@ jobs:
         python -m pip install --upgrade coveralls tox tox-py tox-venv
 
     - name: Run tox targets for Python ${{ matrix.python-version }}
+      if: ${{ matrix.toxenv == 'py' }}
       run: tox --py current
+    - name: Run '${{ matrix.toxenv }}' tox targets
+      if: ${{ matrix.toxenv != 'py' }}
+      run: tox -e ${{ matrix.toxenv }}
 
     - name: Upload coverage data to coveralls.io
       env:
