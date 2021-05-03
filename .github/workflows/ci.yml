@@ -24,6 +24,9 @@ jobs:
           - python-version: "3.x"
             toxenv: "djangomain"
             experimental: true
+          - python-version: "pypy3"
+            toxenv: "PyPy"
+            experimental: false
 
     steps:
     - uses: actions/checkout@v2
@@ -49,8 +52,11 @@ jobs:
       if: ${{ matrix.toxenv == 'py' }}
       run: tox --py current
     - name: Run '${{ matrix.toxenv }}' tox targets
-      if: ${{ matrix.toxenv != 'py' }}
+      if: ${{ matrix.toxenv != 'py' && matrix.toxenv != 'PyPy' }}
       run: tox -e ${{ matrix.toxenv }}
+    - name: Run tox targets for Python ${{ matrix.python-version }}
+      if: ${{ matrix.toxenv == 'PyPy' }}
+      run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
 
     - name: Upload coverage data to coveralls.io
       env:
