@@ -63,24 +63,19 @@ jobs:
       run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
 
     - name: Upload coverage data to coveralls.io
-      continue-on-error: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
-        COVERALLS_PARALLEL: true
-      run: coveralls
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         COVERALLS_FLAG_NAME: run-${{ matrix.python-version }}
+         COVERALLS_PARALLEL: true
+      run: coveralls --service=github
 
-  coveralls:
+  finish:
     name: Indicate completion to coveralls.io
     needs: tests
     runs-on: ubuntu-latest
-    container: python:3-slim
     steps:
     - name: Finalize publishing to coveralls.io
-      continue-on-error: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade coveralls
-        coveralls --finish
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true
