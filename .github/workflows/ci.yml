@@ -67,7 +67,7 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          COVERALLS_FLAG_NAME: run-${{ matrix.python-version }}
          COVERALLS_PARALLEL: true
-      run: coveralls
+      run: coveralls --service=github
 
   finish:
     name: Indicate completion to coveralls.io
