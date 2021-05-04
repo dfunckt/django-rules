@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  tests:
+    name: Python ${{ matrix.python-version }} (${{ matrix.toxenv }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+        experimental: [false]
+        toxenv: ["py"]
+        include:
+          - python-version: "3.x"
+            toxenv: "packaging"
+            experimental: false
+          - python-version: "3.x"
+            toxenv: "djangomain"
+            experimental: true
+          - python-version: "pypy3"
+            toxenv: "PyPy"
+            experimental: false
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade coveralls tox tox-py tox-venv
+    - name: Run tox targets for Python ${{ matrix.python-version }}
+      if: ${{ matrix.toxenv == 'py' }}
+      continue-on-error: ${{ matrix.experimental }}
+      run: tox --py current
+
+    - name: Run '${{ matrix.toxenv }}' tox targets
+      if: ${{ matrix.toxenv != 'py' && matrix.toxenv != 'PyPy' }}
+      continue-on-error: ${{ matrix.experimental }}
+      run: tox -e ${{ matrix.toxenv }}
+
+    - name: Run tox targets for Python ${{ matrix.python-version }}
+      if: ${{ matrix.toxenv == 'PyPy' }}
+      continue-on-error: ${{ matrix.experimental }}
+      run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
+
+    - name: Upload coverage data to coveralls.io
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
+        COVERALLS_PARALLEL: true
+      run: coveralls
+
+  coveralls:
+    name: Indicate completion to coveralls.io
+    needs: tests
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+    - name: Finalize publishing to coveralls.io
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade coveralls
+        coveralls --finish
