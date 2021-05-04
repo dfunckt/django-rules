@@ -40,11 +40,13 @@ jobs:
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}
         restore-keys: |
           ${{ runner.os }}-pip-
+
     - name: Install dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install --upgrade coveralls tox tox-py tox-venv
+
     - name: Run tox targets for Python ${{ matrix.python-version }}
       if: ${{ matrix.toxenv == 'py' }}
       continue-on-error: ${{ matrix.experimental }}
@@ -61,24 +63,19 @@ jobs:
       run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
 
     - name: Upload coverage data to coveralls.io
-      continue-on-error: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
-        COVERALLS_PARALLEL: true
-      run: coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
 
-  coveralls:
+  finish:
     name: Indicate completion to coveralls.io
     needs: tests
     runs-on: ubuntu-latest
-    container: python:3-slim
     steps:
     - name: Finalize publishing to coveralls.io
-      continue-on-error: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade coveralls
-        coveralls --finish
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
