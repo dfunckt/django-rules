@@ -63,11 +63,11 @@ jobs:
       run: tox -e pypy3-django22,pypy3-django30,pypy3-django31,pypy3-django32
 
     - name: Upload coverage data to coveralls.io
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        flag-name: Python ${{ matrix.python-version }}
-        parallel: true
+      env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
+         COVERALLS_PARALLEL: true
+      run: coveralls
 
   finish:
     name: Indicate completion to coveralls.io
