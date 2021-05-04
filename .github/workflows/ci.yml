@@ -65,8 +65,8 @@ jobs:
     - name: Upload coverage data to coveralls.io
       uses: coverallsapp/github-action@master
       with:
-        github-token: ${{ secrets.github_token }}
-        flag-name: run-${{ matrix.test_number }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        flag-name: Python ${{ matrix.python-version }}
         parallel: true
 
   finish:
@@ -77,5 +77,5 @@ jobs:
     - name: Finalize publishing to coveralls.io
       uses: coverallsapp/github-action@master
       with:
-        github-token: ${{ secrets.github_token }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel-finished: true
