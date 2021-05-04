@@ -65,7 +65,7 @@ jobs:
     - name: Upload coverage data to coveralls.io
       env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         COVERALLS_FLAG_NAME: Python ${{ matrix.python-version }}
+         COVERALLS_FLAG_NAME: run-${{ matrix.python-version }}
          COVERALLS_PARALLEL: true
       run: coveralls
 
