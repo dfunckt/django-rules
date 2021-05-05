@@ -17,12 +17,26 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Book',
+            name="Book",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('isbn', models.CharField(max_length=50, unique=True)),
-                ('title', models.CharField(max_length=100)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("isbn", models.CharField(max_length=50, unique=True)),
+                ("title", models.CharField(max_length=100)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
@@ -30,11 +44,20 @@ class Migration(migrations.Migration):
     # TestModel doesn't work under Python 2
     if sys.version_info.major >= 3:
         import rules.contrib.models
+
         operations += [
             migrations.CreateModel(
-                name='TestModel',
+                name="TestModel",
                 fields=[
-                    ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                    (
+                        "id",
+                        models.AutoField(
+                            auto_created=True,
+                            primary_key=True,
+                            serialize=False,
+                            verbose_name="ID",
+                        ),
+                    ),
                 ],
                 bases=(rules.contrib.models.RulesModelMixin, models.Model),
             ),

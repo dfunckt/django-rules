@@ -5,16 +5,16 @@ import unittest
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import HttpRequest, Http404
+from django.http import Http404, HttpRequest
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.views.generic import CreateView, View
 
-import rules
-from rules.contrib.views import AutoPermissionRequiredMixin, objectgetter
-
 from testapp.models import Book
+
+import rules  # noqa
+from rules.contrib.views import AutoPermissionRequiredMixin, objectgetter
 
 from . import TestData
 

@@ -12,7 +12,6 @@ import rules
 @unittest.skipIf(sys.version_info.major < 3, "Python 3 only")
 class RulesModelTests(TestCase):
     def test_preprocess(self):
-        from testapp.models import TestModel
 
         self.assertTrue(rules.perm_exists("testapp.add_testmodel"))
         self.assertTrue(rules.perm_exists("testapp.custom_testmodel"))

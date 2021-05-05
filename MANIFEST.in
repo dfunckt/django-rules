@@ -2,7 +2,9 @@ include CHANGELOG.md
 include INSTALL
 include LICENSE
 include README.rst
+include runtests.sh
 recursive-include tests *
-global-exclude *.pyc
+global-exclude *.py[cod] __pycache__
 global-exclude .coverage
 global-exclude .DS_Store
+exclude .pre-commit-config.yaml tox.ini

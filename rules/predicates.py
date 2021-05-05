@@ -5,16 +5,17 @@ from functools import partial, update_wrapper
 
 from .compat import inspect
 
-
-logger = logging.getLogger('rules')
+logger = logging.getLogger("rules")
 
 
 def assert_has_kwonlydefaults(fn, msg):
     argspec = inspect.getfullargspec(fn)
-    if hasattr(argspec, 'kwonlyargs'):
+    if hasattr(argspec, "kwonlyargs"):
         if not argspec.kwonlyargs:
             return
-        if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(argspec.kwonlydefaults.keys()):
+        if not argspec.kwonlydefaults or len(argspec.kwonlyargs) > len(
+            argspec.kwonlydefaults.keys()
+        ):
             raise TypeError(msg)
 
 
@@ -50,10 +51,15 @@ class Predicate(object):
         #   - fn(obj=None, target=None)
         #   - fn(obj=None)
         #   - fn()
-        assert callable(fn), 'The given predicate is not callable.'
+        assert callable(fn), "The given predicate is not callable."
         innerfn = fn
         if isinstance(fn, Predicate):
-            fn, num_args, var_args, name = fn.fn, fn.num_args, fn.var_args, name or fn.name
+            fn, num_args, var_args, name = (
+                fn.fn,
+                fn.num_args,
+                fn.var_args,
+                name or fn.name,
+            )
             innerfn = fn
         elif isinstance(fn, partial):
             innerfn = fn.func
@@ -72,18 +78,21 @@ class Predicate(object):
             var_args = argspec.varargs is not None
             num_args = len(argspec.args)
         elif isinstance(fn, object):
-            innerfn = getattr(fn, '__call__')
+            innerfn = getattr(fn, "__call__")  # noqa
             argspec = inspect.getfullargspec(innerfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__
         else:  # pragma: no cover
             # We handle all cases, so there's no way we can reach here
-            raise TypeError('Incompatible predicate.')
+            raise TypeError("Incompatible predicate.")
         if bind:
             num_args -= 1
-        assert_has_kwonlydefaults(innerfn, 'The given predicate is missing defaults for keyword-only arguments')
-        assert num_args <= 2, 'Incompatible predicate.'
+        assert_has_kwonlydefaults(
+            innerfn,
+            "The given predicate is missing defaults for keyword-only arguments",
+        )
+        assert num_args <= 2, "Incompatible predicate."
         self.fn = fn
         self.num_args = num_args
         self.var_args = var_args
@@ -91,8 +100,7 @@ class Predicate(object):
         self.bind = bind
 
     def __repr__(self):
-        return '<%s:%s object at %s>' % (
-            type(self).__name__, str(self), hex(id(self)))
+        return "<%s:%s object at %s>" % (type(self).__name__, str(self), hex(id(self)))
 
     def __str__(self):
         return self.name
@@ -149,7 +157,7 @@ class Predicate(object):
         """
         args = tuple(arg for arg in (obj, target) if arg is not NO_VALUE)
         _context.stack.append(Context(args))
-        logger.debug('Testing %s', self)
+        logger.debug("Testing %s", self)
         try:
             return bool(self._apply(*args))
         finally:
@@ -158,26 +166,30 @@ class Predicate(object):
     def __and__(self, other):
         def AND(*args):
             return self._combine(other, operator.and_, args)
-        return type(self)(AND, '(%s & %s)' % (self.name, other.name))
+
+        return type(self)(AND, "(%s & %s)" % (self.name, other.name))
 
     def __or__(self, other):
         def OR(*args):
             return self._combine(other, operator.or_, args)
-        return type(self)(OR, '(%s | %s)' % (self.name, other.name))
+
+        return type(self)(OR, "(%s | %s)" % (self.name, other.name))
 
     def __xor__(self, other):
         def XOR(*args):
             return self._combine(other, operator.xor, args)
-        return type(self)(XOR, '(%s ^ %s)' % (self.name, other.name))
+
+        return type(self)(XOR, "(%s ^ %s)" % (self.name, other.name))
 
     def __invert__(self):
         def INVERT(*args):
             result = self._apply(*args)
             return None if result is None else not result
-        if self.name.startswith('~'):
+
+        if self.name.startswith("~"):
             name = self.name[1:]
         else:
-            name = '~' + self.name
+            name = "~" + self.name
         return type(self)(INVERT, name)
 
     def _combine(self, other, op, args):
@@ -206,14 +218,14 @@ class Predicate(object):
         elif self.num_args > len(args):
             callargs = args + (None,) * (self.num_args - len(args))
         else:
-            callargs = args[:self.num_args]
+            callargs = args[: self.num_args]
         if self.bind:
             callargs = (self,) + callargs
 
         result = self.fn(*callargs)
         result = None if result is None else bool(result)
 
-        logger.debug('  %s = %s', self, 'skipped' if result is None else result)
+        logger.debug("  %s = %s", self, "skipped" if result is None else result)
         return result
 
 
@@ -250,20 +262,20 @@ def predicate(fn=None, name=None, **options):
 
 # Predefined predicates
 
-always_true = predicate(lambda: True, name='always_true')
-always_false = predicate(lambda: False, name='always_false')
+always_true = predicate(lambda: True, name="always_true")
+always_false = predicate(lambda: False, name="always_false")
 
-always_allow = predicate(lambda: True, name='always_allow')
-always_deny = predicate(lambda: False, name='always_deny')
+always_allow = predicate(lambda: True, name="always_allow")
+always_deny = predicate(lambda: False, name="always_deny")
 
 
 def is_bool_like(obj):
-    return hasattr(obj, '__bool__') or hasattr(obj, '__nonzero__')
+    return hasattr(obj, "__bool__") or hasattr(obj, "__nonzero__")
 
 
 @predicate
 def is_authenticated(user):
-    if not hasattr(user, 'is_authenticated'):
+    if not hasattr(user, "is_authenticated"):
         return False  # not a user model
     if not is_bool_like(user.is_authenticated):  # pragma: no cover
         # Django < 1.10
@@ -273,41 +285,41 @@ def is_authenticated(user):
 
 @predicate
 def is_superuser(user):
-    if not hasattr(user, 'is_superuser'):
+    if not hasattr(user, "is_superuser"):
         return False  # swapped user model, doesn't support is_superuser
     return user.is_superuser
 
 
 @predicate
 def is_staff(user):
-    if not hasattr(user, 'is_staff'):
+    if not hasattr(user, "is_staff"):
         return False  # swapped user model, doesn't support is_staff
     return user.is_staff
 
 
 @predicate
 def is_active(user):
-    if not hasattr(user, 'is_active'):
+    if not hasattr(user, "is_active"):
         return False  # swapped user model, doesn't support is_active
     return user.is_active
 
 
 def is_group_member(*groups):
-    assert len(groups) > 0, 'You must provide at least one group name'
+    assert len(groups) > 0, "You must provide at least one group name"
 
     if len(groups) > 3:
-        g = groups[:3] + ('...',)
+        g = groups[:3] + ("...",)
     else:
         g = groups
 
-    name = 'is_group_member:%s' % ','.join(g)
+    name = "is_group_member:%s" % ",".join(g)
 
     @predicate(name)
     def fn(user):
-        if not hasattr(user, 'groups'):
+        if not hasattr(user, "groups"):
             return False  # swapped user model, doesn't support groups
-        if not hasattr(user, '_group_names_cache'):  # pragma: no cover
-            user._group_names_cache = set(user.groups.values_list('name', flat=True))
+        if not hasattr(user, "_group_names_cache"):  # pragma: no cover
+            user._group_names_cache = set(user.groups.values_list("name", flat=True))
         return set(groups).issubset(user._group_names_cache)
 
     return fn
