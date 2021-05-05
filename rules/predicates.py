@@ -2,14 +2,13 @@ import logging
 import operator
 import threading
 from functools import partial, update_wrapper
-
-from .compat import inspect
+from inspect import getfullargspec, isfunction, ismethod
 
 logger = logging.getLogger("rules")
 
 
 def assert_has_kwonlydefaults(fn, msg):
-    argspec = inspect.getfullargspec(fn)
+    argspec = getfullargspec(fn)
     if hasattr(argspec, "kwonlyargs"):
         if not argspec.kwonlyargs:
             return
@@ -63,23 +62,23 @@ class Predicate(object):
             innerfn = fn
         elif isinstance(fn, partial):
             innerfn = fn.func
-            argspec = inspect.getfullargspec(innerfn)
+            argspec = getfullargspec(innerfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - len(fn.args)
-            if inspect.ismethod(innerfn):
+            if ismethod(innerfn):
                 num_args -= 1  # skip `self`
             name = fn.func.__name__
-        elif inspect.ismethod(fn):
-            argspec = inspect.getfullargspec(fn)
+        elif ismethod(fn):
+            argspec = getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
-        elif inspect.isfunction(fn):
-            argspec = inspect.getfullargspec(fn)
+        elif isfunction(fn):
+            argspec = getfullargspec(fn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args)
         elif isinstance(fn, object):
             innerfn = getattr(fn, "__call__")  # noqa
-            argspec = inspect.getfullargspec(innerfn)
+            argspec = getfullargspec(innerfn)
             var_args = argspec.varargs is not None
             num_args = len(argspec.args) - 1  # skip `self`
             name = name or type(fn).__name__

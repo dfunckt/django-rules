@@ -12,8 +12,6 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 # versions before 1.9. For usage help see Django's docs for 1.9 or later.
 from django.views.generic.edit import BaseCreateView
 
-from rules.compat.six import string_types, wraps  # noqa
-
 LoginRequiredMixin = mixins.LoginRequiredMixin
 UserPassesTestMixin = mixins.UserPassesTestMixin
 
@@ -205,7 +203,7 @@ def permission_required(
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             # Normalize to a list of permissions
-            if isinstance(perm, string_types):
+            if isinstance(perm, str):
                 perms = (perm,)
             else:
                 perms = perm

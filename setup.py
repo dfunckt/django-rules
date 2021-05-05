@@ -47,7 +47,6 @@ setup(
         "rules",
         "rules.templatetags",
         "rules.contrib",
-        "rules.compat",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
