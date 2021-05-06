@@ -6,14 +6,18 @@ Django, without requiring a database. At its core, it is a generic framework
 for building rule-based systems, similar to `decision trees`_. It can also be
 used as a standalone library in other contexts and frameworks.
 
-.. image:: https://travis-ci.org/dfunckt/django-rules.svg?branch=master
-    :target: https://travis-ci.org/dfunckt/django-rules
+.. image:: https://img.shields.io/github/workflow/status/dfunckt/django-rules/CI/master
+    :target: https://github.com/dfunckt/django-rules/actions
 .. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
     :target: https://coveralls.io/r/dfunckt/django-rules
 .. image:: https://img.shields.io/pypi/v/rules.svg
-    :target: https://pypi.python.org/pypi/rules
+    :target: https://pypi.org/project/rules/
 .. image:: https://img.shields.io/pypi/pyversions/rules.svg
-    :target: https://pypi.python.org/pypi/rules
+    :target: https://pypi.org/project/rules/
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+    :target: https://github.com/pre-commit/pre-commit
 
 .. _decision trees: http://wikipedia.org/wiki/Decision_tree
 

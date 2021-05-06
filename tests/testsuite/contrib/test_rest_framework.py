@@ -5,15 +5,15 @@ import unittest
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
-from django import http
 from django.test import TestCase
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.test import APIRequestFactory
 from rest_framework.viewsets import ModelViewSet
 
-import rules
+import rules  # noqa
 from rules.contrib.rest_framework import AutoPermissionViewSetMixin
 
 

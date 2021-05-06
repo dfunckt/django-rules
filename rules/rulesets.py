@@ -10,7 +10,7 @@ class RuleSet(dict):
 
     def add_rule(self, name, pred):
         if name in self:
-            raise KeyError('A rule with name `%s` already exists' % name)
+            raise KeyError("A rule with name `%s` already exists" % name)
         self[name] = pred
 
     def set_rule(self, name, pred):

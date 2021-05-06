@@ -1,20 +1,18 @@
 from functools import wraps
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth import mixins
+from django.contrib.auth import REDIRECT_FIELD_NAME, mixins
 from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured, FieldError
+from django.core.exceptions import FieldError, ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
-
 
 # These are made available for convenience, as well as for use in Django
 # versions before 1.9. For usage help see Django's docs for 1.9 or later.
 from django.views.generic.edit import BaseCreateView
 
-from rules.compat.six import string_types, wraps
+from rules.compat.six import string_types, wraps  # noqa
 
 LoginRequiredMixin = mixins.LoginRequiredMixin
 UserPassesTestMixin = mixins.UserPassesTestMixin
@@ -30,6 +28,7 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
     in the view. If there's no ``get_object`` method, permission checking
     is model-level, that is exactly like Django's ``PermissionRequiredMixin``.
     """
+
     def get_permission_object(self):
         """
         Override this method to provide the object to check for permission
@@ -39,7 +38,7 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         """
         if not isinstance(self, BaseCreateView):
             # We do NOT want to call get_object in a BaseCreateView, see issue #85
-            if hasattr(self, 'get_object') and callable(self.get_object):
+            if hasattr(self, "get_object") and callable(self.get_object):
                 # Requires SingleObjectMixin or equivalent ``get_object`` method
                 return self.get_object()
         return None
@@ -112,8 +111,9 @@ class AutoPermissionRequiredMixin(PermissionRequiredMixin):
                     "AutoPermissionRequiredMixin was used, but permission_type was "
                     "neither set nor could be determined automatically for {0}. "
                     "Consider setting permission_type on the view manually or "
-                    "adding {0} to the permission_type_map."
-                    .format(self.__class__.__name__)
+                    "adding {0} to the permission_type_map.".format(
+                        self.__class__.__name__
+                    )
                 )
 
         perms = []
@@ -129,7 +129,7 @@ class AutoPermissionRequiredMixin(PermissionRequiredMixin):
         return perms
 
 
-def objectgetter(model, attr_name='pk', field_name='pk'):
+def objectgetter(model, attr_name="pk", field_name="pk"):
     """
     Helper that returns a function suitable for use as the ``fn`` argument
     to the ``permission_required`` decorator. Internally uses
@@ -142,21 +142,31 @@ def objectgetter(model, attr_name='pk', field_name='pk'):
     ``field_name`` is the model's field name by which the lookup is made, eg.
     "id", "slug", etc.
     """
+
     def _getter(request, *view_args, **view_kwargs):
         if attr_name not in view_kwargs:
             raise ImproperlyConfigured(
-                'Argument {0} is not available. Given arguments: [{1}]'
-                .format(attr_name, ', '.join(view_kwargs.keys())))
+                "Argument {0} is not available. Given arguments: [{1}]".format(
+                    attr_name, ", ".join(view_kwargs.keys())
+                )
+            )
         try:
             return get_object_or_404(model, **{field_name: view_kwargs[attr_name]})
         except FieldError:
             raise ImproperlyConfigured(
-                'Model {0} has no field named {1}'
-                .format(model, field_name))
+                "Model {0} has no field named {1}".format(model, field_name)
+            )
+
     return _getter
 
 
-def permission_required(perm, fn=None, login_url=None, raise_exception=False, redirect_field_name=REDIRECT_FIELD_NAME):
+def permission_required(
+    perm,
+    fn=None,
+    login_url=None,
+    raise_exception=False,
+    redirect_field_name=REDIRECT_FIELD_NAME,
+):
     """
     View decorator that checks for the given permissions before allowing the
     view to execute. Use it like this::
@@ -190,6 +200,7 @@ def permission_required(perm, fn=None, login_url=None, raise_exception=False, re
     permissions check fails. If omitted or empty, ``settings.LOGIN_URL`` is
     used.
     """
+
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
@@ -214,8 +225,9 @@ def permission_required(perm, fn=None, login_url=None, raise_exception=False, re
                 if raise_exception:
                     raise PermissionDenied()
                 else:
-                    return _redirect_to_login(request, view_func.__name__,
-                                              login_url, redirect_field_name)
+                    return _redirect_to_login(
+                        request, view_func.__name__, login_url, redirect_field_name
+                    )
             else:
                 # User has all required permissions -- allow the view to execute
                 return view_func(request, *args, **kwargs)
@@ -229,9 +241,9 @@ def _redirect_to_login(request, view_name, login_url, redirect_field_name):
     redirect_url = login_url or settings.LOGIN_URL
     if not redirect_url:  # pragma: no cover
         raise ImproperlyConfigured(
-            'permission_required({0}): You must either provide '
+            "permission_required({0}): You must either provide "
             'the "login_url" argument to the "permission_required" '
-            'decorator or configure settings.LOGIN_URL'.format(view_name)
+            "decorator or configure settings.LOGIN_URL".format(view_name)
         )
     redirect_url = force_text(redirect_url)
     return redirect_to_login(request.get_full_path(), redirect_url, redirect_field_name)

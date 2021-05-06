@@ -1,6 +1,5 @@
 from .rulesets import RuleSet
 
-
 permissions = RuleSet()
 
 

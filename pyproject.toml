@@ -1,0 +1,9 @@
+[tool.black]
+target-version = ['py36']
+
+[tool.isort]
+profile = "black"
+known_django = "django"
+known_first_party = ['django-rules']
+sections = ['FUTURE', 'STDLIB', 'DJANGO', 'THIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
+skip=['migrations', '.git', '__pycache__', 'venv']

@@ -5,16 +5,16 @@ import unittest
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import HttpRequest, Http404
+from django.http import Http404, HttpRequest
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.views.generic import CreateView, View
 
-import rules
-from rules.contrib.views import AutoPermissionRequiredMixin, objectgetter
-
 from testapp.models import Book
+
+import rules  # noqa
+from rules.contrib.views import AutoPermissionRequiredMixin, objectgetter
 
 from . import TestData
 
@@ -45,19 +45,19 @@ class FBVDecoratorTests(TestData, TestCase):
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("change_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin can change Adrian's book
         self.assertTrue(self.client.login(username="martin", password="secr3t"))
         response = self.client.get(reverse("change_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Adrian can delete his book
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("delete_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin can *not* create a book
         # Up to Django v2.1, the response was a redirect to login
@@ -81,7 +81,7 @@ class FBVDecoratorTests(TestData, TestCase):
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("view_with_permission_list", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin does not have delete permission
         self.assertTrue(self.client.login(username="martin", password="secr3t"))
@@ -94,7 +94,7 @@ class FBVDecoratorTests(TestData, TestCase):
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("view_with_object", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         self.assertTrue(self.client.login(username="martin", password="secr3t"))
         response = self.client.get(reverse("view_with_object", args=(1,)))
@@ -112,19 +112,19 @@ class CBVMixinTests(TestData, TestCase):
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("cbv.change_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin can change Adrian's book
         self.assertTrue(self.client.login(username="martin", password="secr3t"))
         response = self.client.get(reverse("cbv.change_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Adrian can delete his book
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("cbv.delete_book", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin can *not* delete Adrian's book
         # Up to Django v2.1, the response was a redirect to login
@@ -143,7 +143,7 @@ class CBVMixinTests(TestData, TestCase):
         self.assertTrue(self.client.login(username="adrian", password="secr3t"))
         response = self.client.get(reverse("cbv.view_with_permission_list", args=(1,)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(force_str(response.content), "OK")
+        self.assertEqual(force_str(response.content).strip(), "OK")
 
         # Martin does not have delete permission
         # Up to Django v2.1, the response was a redirect to login
