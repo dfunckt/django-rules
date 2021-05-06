@@ -1,8 +1,5 @@
 from __future__ import absolute_import
 
-import sys
-import unittest
-
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
@@ -17,7 +14,6 @@ import rules  # noqa
 from rules.contrib.rest_framework import AutoPermissionViewSetMixin
 
 
-@unittest.skipIf(sys.version_info.major < 3, "Python 3 only")
 class AutoPermissionRequiredMixinTests(TestCase):
     def setUp(self):
         from testapp.models import TestModel
