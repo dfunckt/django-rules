@@ -21,6 +21,6 @@ from .rulesets import (  # noqa
     test_rule,
 )
 
-VERSION = (2, 2, 0, "final", 1)
+VERSION = (3, 0, 0, "final", 1)
 
 default_app_config = "rules.apps.RulesConfig"

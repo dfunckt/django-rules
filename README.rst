@@ -47,6 +47,7 @@ Table of Contents
 =================
 
 - `Requirements`_
+- `Upgrading from 2.x`_
 - `Upgrading from 1.x`_
 - `How to install`_
 
@@ -83,8 +84,9 @@ Table of Contents
 Requirements
 ============
 
-``rules`` requires Python 3.6 or newer. It can optionally integrate with
-Django, in which case requires Django 2.2 or newer.
+``rules`` requires Python 3.6 or newer. The last version to support Python 2.7
+is ``rules`` 2.2. It can optionally integrate with Django, in which case
+requires Django 2.2 or newer.
 
 *Note*: At any given moment in time, ``rules`` will maintain support for all
 currently supported Django versions, while dropping support for those versions
@@ -92,6 +94,14 @@ that reached end-of-life in minor releases. See the `Supported Versions`_
 section on Django Project website for the current state and timeline.
 
 .. _Supported Versions: https://www.djangoproject.com/download/#supported-versions
+
+
+Upgrading from 2.x
+==================
+
+The are no significant changes between ``rules`` 2.x and 3.x except dropping
+support for Python 2, so before upgrading to 3.x you just need to make sure
+you're running a supported Python 3 version.
 
 
 Upgrading from 1.x

@@ -1,9 +1,14 @@
 Changelog
 =========
 
+## v3.0.0 - 2021/05/10
+
+- Dropped support for Python 2
+- Dropped support for Django versions before 2.2
+
 ## v2.2.0 - 2020/01/17
 
-- Added compatibility with Django v3.0
+- Added support for Django v3.0
 
 ## v2.1.0 - 2019/08/11
 
@@ -21,8 +26,8 @@ Changelog
 
 ## v2.0.0 - 2018/07/22
 
-- Removed support for Python 2.6 and 3.3
-- Removed support for Django versions before 1.11
+- Dropped support for Python 2.6 and 3.3
+- Dropped support for Django versions before 1.11
 - Removed ``SkipPredicate`` exception and ``skip`` method of ``Predicate``
 - Removed ``replace_rule`` and related APIs
 - Added ``set_rule`` and related APIs to safely replace a rule without having
