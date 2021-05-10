@@ -1,18 +1,13 @@
 from __future__ import absolute_import
 
-import sys
-import unittest
-
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 import rules
 
 
-@unittest.skipIf(sys.version_info.major < 3, "Python 3 only")
 class RulesModelTests(TestCase):
     def test_preprocess(self):
-
         self.assertTrue(rules.perm_exists("testapp.add_testmodel"))
         self.assertTrue(rules.perm_exists("testapp.custom_testmodel"))
 

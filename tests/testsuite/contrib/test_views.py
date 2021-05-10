@@ -1,8 +1,5 @@
 from __future__ import absolute_import
 
-import sys
-import unittest
-
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import Http404, HttpRequest
@@ -152,7 +149,6 @@ class CBVMixinTests(TestData, TestCase):
         self.assertIn(response.status_code, [302, 403])
 
 
-@unittest.skipIf(sys.version_info.major < 3, "Python 3 only")
 class AutoPermissionRequiredMixinTests(TestCase):
     def setUp(self):
         from testapp.models import TestModel
