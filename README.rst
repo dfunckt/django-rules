@@ -414,6 +414,7 @@ Now, checking again gives ``adrian`` the required permissions:
     >>> martin.has_perm('books.delete_book', guidetodjango)
     False
 
+**NOTE:** Calling `has_perm` on a superuser will ALWAYS return `True`.
 
 Permissions in models
 ---------------------
