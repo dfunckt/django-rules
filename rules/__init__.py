@@ -22,5 +22,3 @@ from .rulesets import (  # noqa
 )
 
 VERSION = (3, 0, 0, "final", 1)
-
-default_app_config = "rules.apps.RulesConfig"
