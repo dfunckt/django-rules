@@ -5,7 +5,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, mixins
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import FieldError, ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 # These are made available for convenience, as well as for use in Django
@@ -243,5 +243,5 @@ def _redirect_to_login(request, view_name, login_url, redirect_field_name):
             'the "login_url" argument to the "permission_required" '
             "decorator or configure settings.LOGIN_URL".format(view_name)
         )
-    redirect_url = force_text(redirect_url)
+    redirect_url = force_str(redirect_url)
     return redirect_to_login(request.get_full_path(), redirect_url, redirect_field_name)
