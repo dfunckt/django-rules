@@ -979,11 +979,11 @@ and use a rule set any way you'd use a dict.
 Instance methods
 ++++++++++++++++
 
-``add_rule(name, predicate)``
+``add_rule(name, predicate, verbose_name=None)``
     Adds a predicate to the rule set, assigning it to the given rule name.
     Raises ``KeyError`` if another rule with that name already exists.
 
-``set_rule(name, predicate)``
+``set_rule(name, predicate, verbose_name=None)``
     Set the rule with the given name, regardless if one already exists.
 
 ``remove_rule(name)``
@@ -1075,10 +1075,10 @@ Shortcuts
 Managing the shared rule set
 ++++++++++++++++++++++++++++
 
-``add_rule(name, predicate)``
+``add_rule(name, predicate, verbose_name=None)``
     Adds a rule to the shared rule set. See ``RuleSet.add_rule``.
 
-``set_rule(name, predicate)``
+``set_rule(name, predicate, verbose_name=None)``
     Set the rule with the given name from the shared rule set. See
     ``RuleSet.set_rule``.
 
@@ -1100,10 +1100,10 @@ Managing the shared rule set
 Managing the permissions rule set
 +++++++++++++++++++++++++++++++++
 
-``add_perm(name, predicate)``
+``add_perm(name, predicate, verbose_name=None)``
     Adds a rule to the permissions rule set. See ``RuleSet.add_rule``.
 
-``set_perm(name, predicate)``
+``set_perm(name, predicate, verbose_name=None)``
     Replace a rule from the permissions rule set. See ``RuleSet.set_rule``.
 
 ``remove_perm(name)``
