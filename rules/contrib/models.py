@@ -36,7 +36,10 @@ class RulesModelBaseMixin:
         new_class._meta.rules_permissions = perms
         new_class.preprocess_rules_permissions(perms)
         for perm_type, predicate in perms.items():
-            add_perm(new_class.get_perm(perm_type), predicate)
+            if isinstance(predicate, dict):
+                add_perm(new_class.get_perm(perm_type), predicate['pred'], verbose_name=predicate['verbose_name'])
+            else:
+                add_perm(new_class.get_perm(perm_type), predicate)
         return new_class
 
 

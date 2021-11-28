@@ -24,8 +24,10 @@ is_editor = rules.is_group_member("editors")
 rules.add_rule("change_book", is_book_author | is_editor)
 rules.add_rule("delete_book", is_book_author)
 rules.add_rule("create_book", is_boss)
+rules.add_rule("borrow_book", is_boss, verbose_name="Borrow the book")
 
 # Permissions
 
 rules.add_perm("testapp.change_book", is_book_author | is_editor)
 rules.add_perm("testapp.delete_book", is_book_author)
+rules.add_perm("testapp.borrow_book", is_boss, verbose_name="Borrow the book")

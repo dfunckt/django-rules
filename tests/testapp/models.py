@@ -18,8 +18,12 @@ class Book(models.Model):
 
 class TestModel(RulesModel):
     class Meta:
-        rules_permissions = {"add": rules.always_true, "view": rules.always_true}
+        rules_permissions = {
+            "add": {'pred': rules.always_true, 'verbose_name': "Add"},
+            "view": rules.always_true,
+        }
 
     @classmethod
     def preprocess_rules_permissions(cls, perms):
-        perms["custom"] = rules.always_true
+        perms["custom"] = {'pred': rules.always_true, 'verbose_name': "Custom Perm"}
+        perms["custom2"] = rules.always_true

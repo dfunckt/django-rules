@@ -3,12 +3,12 @@ from .rulesets import RuleSet
 permissions = RuleSet()
 
 
-def add_perm(name, pred):
-    permissions.add_rule(name, pred)
+def add_perm(name, pred, verbose_name=None):
+    permissions.add_rule(name, pred, verbose_name=verbose_name)
 
 
-def set_perm(name, pred):
-    permissions.set_rule(name, pred)
+def set_perm(name, pred, verbose_name=None):
+    permissions.set_rule(name, pred, verbose_name=verbose_name)
 
 
 def remove_perm(name):
@@ -17,6 +17,10 @@ def remove_perm(name):
 
 def perm_exists(name):
     return permissions.rule_exists(name)
+
+
+def perm_verbose_name(name):
+    return permissions.rule_verbose_name(name)
 
 
 def has_perm(name, *args, **kwargs):
