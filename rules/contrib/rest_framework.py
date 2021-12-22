@@ -1,5 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+
 from ..viewsets import BaseAutoPermissionMixin
+
 
 class AutoPermissionViewSetMixin(BaseAutoPermissionMixin):
     """
