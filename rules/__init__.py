@@ -21,4 +21,4 @@ from .rulesets import (  # noqa
     test_rule,
 )
 
-VERSION = (3, 0, 0, "final", 1)
+VERSION = (3, 1, 0, "final", 1)
