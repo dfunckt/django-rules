@@ -1,11 +1,15 @@
 Changelog
 =========
 
+## v3.2.1 - 2022/03/02
+
+- Fix incorrect Django versions mentioned in CHANGELOG
+
 ## v3.2.0 - 2022/03/02
 
 - Added support for Python 3.10
 - Dropped support for Python 3.6 (EOL)
-- Dropped support for Django 3.1 and 3.2 (EOL)
+- Dropped support for Django 3.0 and 3.1 (EOL)
 
 ## v3.1.0 - 2021/12/22
 
