@@ -3,11 +3,12 @@ import operator
 import threading
 from functools import partial, update_wrapper
 from inspect import getfullargspec, isfunction, ismethod
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 logger = logging.getLogger("rules")
 
 
-def assert_has_kwonlydefaults(fn, msg):
+def assert_has_kwonlydefaults(fn: Callable[..., Any], msg: str) -> None:
     argspec = getfullargspec(fn)
     if hasattr(argspec, "kwonlyargs"):
         if not argspec.kwonlyargs:
@@ -19,21 +20,21 @@ def assert_has_kwonlydefaults(fn, msg):
 
 
 class Context(dict):
-    def __init__(self, args):
+    def __init__(self, args: Tuple[Any, ...]) -> None:
         super(Context, self).__init__()
         self.args = args
 
 
 class localcontext(threading.local):
-    def __init__(self):
-        self.stack = []
+    def __init__(self) -> None:
+        self.stack: List[Context] = []
 
 
 _context = localcontext()
 
 
 class NoValueSentinel(object):
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return False
 
     __nonzero__ = __bool__  # python 2
@@ -45,7 +46,17 @@ del NoValueSentinel
 
 
 class Predicate(object):
-    def __init__(self, fn, name=None, bind=False):
+    fn: Callable[..., Any]
+    num_args: int
+    var_args: bool
+    name: str
+
+    def __init__(
+        self,
+        fn: Union["Predicate", Callable[..., Any]],
+        name: Optional[str] = None,
+        bind: bool = False,
+    ) -> None:
         # fn can be a callable with any of the following signatures:
         #   - fn(obj=None, target=None)
         #   - fn(obj=None)
@@ -98,13 +109,13 @@ class Predicate(object):
         self.name = name or fn.__name__
         self.bind = bind
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<%s:%s object at %s>" % (type(self).__name__, str(self), hex(id(self)))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> Any:
         # this method is defined as variadic in order to not mask the
         # underlying callable's signature that was most likely decorated
         # as a predicate. internally we consistently call ``_apply`` that
@@ -114,7 +125,7 @@ class Predicate(object):
         return self.fn(*args, **kwargs)
 
     @property
-    def context(self):
+    def context(self) -> Optional[Context]:
         """
         The currently active invocation context. A new context is created as a
         result of invoking ``test()`` and is only valid for the duration of
@@ -150,7 +161,7 @@ class Predicate(object):
         except IndexError:
             return None
 
-    def test(self, obj=NO_VALUE, target=NO_VALUE):
+    def test(self, obj: Any = NO_VALUE, target: Any = NO_VALUE) -> bool:
         """
         The canonical method to invoke predicates.
         """
@@ -162,25 +173,25 @@ class Predicate(object):
         finally:
             _context.stack.pop()
 
-    def __and__(self, other):
+    def __and__(self, other) -> "Predicate":
         def AND(*args):
             return self._combine(other, operator.and_, args)
 
         return type(self)(AND, "(%s & %s)" % (self.name, other.name))
 
-    def __or__(self, other):
+    def __or__(self, other) -> "Predicate":
         def OR(*args):
             return self._combine(other, operator.or_, args)
 
         return type(self)(OR, "(%s | %s)" % (self.name, other.name))
 
-    def __xor__(self, other):
+    def __xor__(self, other) -> "Predicate":
         def XOR(*args):
             return self._combine(other, operator.xor, args)
 
         return type(self)(XOR, "(%s ^ %s)" % (self.name, other.name))
 
-    def __invert__(self):
+    def __invert__(self) -> "Predicate":
         def INVERT(*args):
             result = self._apply(*args)
             return None if result is None else not result
@@ -208,7 +219,7 @@ class Predicate(object):
 
         return op(self_result, other_result)
 
-    def _apply(self, *args):
+    def _apply(self, *args) -> Optional[bool]:
         # Internal method that is used to invoke the predicate with the
         # proper number of positional arguments, inside the current
         # invocation context.
@@ -268,12 +279,12 @@ always_allow = predicate(lambda: True, name="always_allow")
 always_deny = predicate(lambda: False, name="always_deny")
 
 
-def is_bool_like(obj):
+def is_bool_like(obj) -> bool:
     return hasattr(obj, "__bool__") or hasattr(obj, "__nonzero__")
 
 
 @predicate
-def is_authenticated(user):
+def is_authenticated(user) -> bool:
     if not hasattr(user, "is_authenticated"):
         return False  # not a user model
     if not is_bool_like(user.is_authenticated):  # pragma: no cover
@@ -283,27 +294,27 @@ def is_authenticated(user):
 
 
 @predicate
-def is_superuser(user):
+def is_superuser(user) -> bool:
     if not hasattr(user, "is_superuser"):
         return False  # swapped user model, doesn't support is_superuser
     return user.is_superuser
 
 
 @predicate
-def is_staff(user):
+def is_staff(user) -> bool:
     if not hasattr(user, "is_staff"):
         return False  # swapped user model, doesn't support is_staff
     return user.is_staff
 
 
 @predicate
-def is_active(user):
+def is_active(user) -> bool:
     if not hasattr(user, "is_active"):
         return False  # swapped user model, doesn't support is_active
     return user.is_active
 
 
-def is_group_member(*groups):
+def is_group_member(*groups) -> Callable[..., Any]:
     assert len(groups) > 0, "You must provide at least one group name"
 
     if len(groups) > 3:
@@ -314,7 +325,7 @@ def is_group_member(*groups):
     name = "is_group_member:%s" % ",".join(g)
 
     @predicate(name)
-    def fn(user):
+    def fn(user) -> bool:
         if not hasattr(user, "groups"):
             return False  # swapped user model, doesn't support groups
         if not hasattr(user, "_group_names_cache"):  # pragma: no cover

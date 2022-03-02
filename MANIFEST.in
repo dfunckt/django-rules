@@ -8,3 +8,4 @@ global-exclude *.py[cod] __pycache__
 global-exclude .coverage
 global-exclude .DS_Store
 exclude .pre-commit-config.yaml tox.ini
+recursive-include rules *.typed
