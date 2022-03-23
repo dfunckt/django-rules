@@ -1,9 +1,13 @@
 Changelog
 =========
 
+## v3.3.0 - 2022/03/23
+
+- Introduce type annotations for common APIs
+
 ## v3.2.1 - 2022/03/02
 
-- Fix incorrect Django versions mentioned in CHANGELOG
+- Fixed incorrect Django versions mentioned in CHANGELOG
 
 ## v3.2.0 - 2022/03/02
 
