@@ -38,7 +38,7 @@ jobs:
           - python-version: "3.x"
             toxenv: "djangomain"
             experimental: true
-          - python-version: "pypy3"
+          - python-version: "pypy-3.8"
             toxenv: "PyPy"
             experimental: false
 
