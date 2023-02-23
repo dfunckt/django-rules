@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
       - uses: pre-commit/action@v2.0.2
@@ -38,14 +38,14 @@ jobs:
           - python-version: "3.x"
             toxenv: "djangomain"
             experimental: true
-          - python-version: "pypy-3.8"
+          - python-version: "pypy-3.9"
             toxenv: "PyPy"
             experimental: false
 
     steps:
     - uses: actions/checkout@v3
 
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
