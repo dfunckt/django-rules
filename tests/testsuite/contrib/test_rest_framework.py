@@ -66,7 +66,7 @@ class AutoPermissionRequiredMixinTests(TestCase):
         )
         # Authenticated with unauthorized destroy should be forbidden due to missing
         # delete permission
-        user = User.objects.create_user(username='user', password='pass')
+        user = User.objects.create_user(username="user", password="pass")
         force_authenticate(self.req, user=user)
         self.assertEqual(
             self.vs.as_view({"get": "destroy"})(self.req, pk=1).status_code, 403
