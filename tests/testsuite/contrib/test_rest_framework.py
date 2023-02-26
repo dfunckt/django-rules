@@ -1,13 +1,14 @@
 from __future__ import absolute_import
 
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.viewsets import ModelViewSet
 
 import rules  # noqa
@@ -26,6 +27,7 @@ class AutoPermissionRequiredMixinTests(TestCase):
         class TestViewSet(AutoPermissionViewSetMixin, ModelViewSet):
             queryset = TestModel.objects.all()
             serializer_class = TestModelSerializer
+            authentication_classes = [BasicAuthentication]
             permission_type_map = AutoPermissionViewSetMixin.permission_type_map.copy()
             permission_type_map["custom_detail"] = "add"
             permission_type_map["custom_nodetail"] = "add"
@@ -58,7 +60,14 @@ class AutoPermissionRequiredMixinTests(TestCase):
         self.assertEqual(
             self.vs.as_view({"get": "retrieve"})(self.req, pk=1).status_code, 200
         )
-        # Destroy should be forbidden due to missing delete permission
+        # Unauthenticated destroy should be return 401 due to missing credentials
+        self.assertEqual(
+            self.vs.as_view({"get": "destroy"})(self.req, pk=1).status_code, 401
+        )
+        # Authenticated with unauthorized destroy should be forbidden due to missing
+        # delete permission
+        user = User.objects.create_user(username='user', password='pass')
+        force_authenticate(self.req, user=user)
         self.assertEqual(
             self.vs.as_view({"get": "destroy"})(self.req, pk=1).status_code, 403
         )
