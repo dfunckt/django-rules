@@ -12,6 +12,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 # versions before 1.9. For usage help see Django's docs for 1.9 or later.
 from django.views.generic.edit import BaseCreateView
 
+from ..viewsets import BaseAutoPermissionMixin
+
 LoginRequiredMixin = mixins.LoginRequiredMixin
 UserPassesTestMixin = mixins.UserPassesTestMixin
 
@@ -47,7 +49,7 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         return self.request.user.has_perms(perms, obj)
 
 
-class AutoPermissionRequiredMixin(PermissionRequiredMixin):
+class AutoPermissionRequiredMixin(PermissionRequiredMixin, BaseAutoPermissionMixin):
     """
     An extended variant of PermissionRequiredMixin which automatically determines
     the permission to check based on the type of view it's used with.
@@ -119,7 +121,7 @@ class AutoPermissionRequiredMixin(PermissionRequiredMixin):
             model = getattr(self, "model", None)
             if model is None:
                 model = self.get_queryset().model
-            perms.append(model.get_perm(perm_type))
+            perms.append(self.get_permission_for_model(model, perm_type))
 
         # If additional permissions have been defined, consider them as well
         if self.permission_required is not None:
