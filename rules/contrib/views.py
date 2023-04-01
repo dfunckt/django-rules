@@ -1,4 +1,11 @@
 from functools import wraps
+from pkgutil import iter_modules
+
+if "rest_framework" in (name for loader, name, ispkg in iter_modules()):
+    has_drf = True
+    from rest_framework.generics import CreateAPIView, ListAPIView
+else:
+    has_drf = False
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, mixins
@@ -34,7 +41,11 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         ``SingleObjectMixin``. Returns None if there's no ``get_object``
         method.
         """
-        if not isinstance(self, BaseCreateView):
+        if has_drf:
+            class_list = (BaseCreateView, CreateAPIView, ListAPIView)
+        else:
+            class_list = (BaseCreateView,)
+        if not isinstance(self, class_list):
             # We do NOT want to call get_object in a BaseCreateView, see issue #85
             if hasattr(self, "get_object") and callable(self.get_object):
                 # Requires SingleObjectMixin or equivalent ``get_object`` method
