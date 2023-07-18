@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Unreleased
+
+- Add support for Django 4.1, 4.2
+- Drop support for Django 4.0, 2.2 EOL
+- Drop support for Python 3.7 EOL
+- Drop support for PyPy and PyPy3
+
 ## v3.3.0 - 2022/03/23
 
 - Introduce type annotations for common APIs
