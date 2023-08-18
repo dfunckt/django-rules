@@ -7,6 +7,8 @@ Changelog
 - Add support for Python 3.11 and 3.12
 - Drop support for EOL Python 3.7
 - Drop support for EOL Django 2.2 and 4.0
+- Fix bug: type annotations were not used because ``py.typed`` was not always
+  installed.
 
 ## v3.3.0 - 2022/03/23
 
