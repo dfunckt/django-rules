@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Unreleased
+
+- Fix bug: type annotations were not used because ``py.typed`` was not always
+  installed.
+
 ## v3.3.0 - 2022/03/23
 
 - Introduce type annotations for common APIs
