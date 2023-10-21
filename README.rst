@@ -6,7 +6,7 @@ Django, without requiring a database. At its core, it is a generic framework
 for building rule-based systems, similar to `decision trees`_. It can also be
 used as a standalone library in other contexts and frameworks.
 
-.. image:: https://img.shields.io/github/workflow/status/dfunckt/django-rules/CI/master
+.. image:: https://img.shields.io/github/actions/workflow/status/dfunckt/django-rules/ci.yml?branch=master
     :target: https://github.com/dfunckt/django-rules/actions
 .. image:: https://coveralls.io/repos/dfunckt/django-rules/badge.svg
     :target: https://coveralls.io/r/dfunckt/django-rules
