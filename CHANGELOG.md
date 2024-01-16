@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Unreleased
+
+- Add support for Django 4.2 and 5.0
+- Add support for Python 3.11 and 3.12
+- Drop support for EOL Python 3.7
+- Drop support for EOL Django 2.2 and 4.0
+
 ## v3.3.0 - 2022/03/23
 
 - Introduce type annotations for common APIs
