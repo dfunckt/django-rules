@@ -64,13 +64,13 @@ class Predicate(object):
         assert callable(fn), "The given predicate is not callable."
         innerfn = fn
         if isinstance(fn, Predicate):
-            fn, num_args, var_args, name = (
+            innerfn, num_args, var_args, name = (
                 fn.fn,
                 fn.num_args,
                 fn.var_args,
                 name or fn.name,
             )
-            innerfn = fn
+            fn = innerfn
         elif isinstance(fn, partial):
             innerfn = fn.func
             argspec = getfullargspec(innerfn)
