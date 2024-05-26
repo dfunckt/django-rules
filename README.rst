@@ -218,7 +218,7 @@ Predicates can do pretty much anything with the given arguments, but must
 always return ``True`` if the condition they check is true, ``False``
 otherwise. ``rules`` comes with several predefined predicates that you may
 read about later on in `API Reference`_, that are mostly useful when dealing
-with `authorization in Django`_.
+with authorization in Django.
 
 
 Dynamic predicates
@@ -359,8 +359,6 @@ any context. There's actually no import of anything Django-related in the
 whole app (except in the ``rules.templatetags`` module). ``rules`` however can
 integrate tightly with Django to provide authorization.
 
-
-.. _authorization in Django:
 
 Using Rules with Django
 =======================
@@ -573,7 +571,7 @@ You can customise the object either by overriding ``get_object`` or
 For more information refer to the `Django documentation`_ and the
 ``rules.contrib.views`` module.
 
-.. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
+.. _Django documentation: https://docs.djangoproject.com/en/dev/topics/auth/default/#limiting-access-to-logged-in-users
 
 Checking permission automatically based on view type
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
