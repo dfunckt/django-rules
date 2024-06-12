@@ -14,6 +14,9 @@ from .models import Book
 
 
 class BookMixin(object):
+    # or just one line: model = Book
+    def get_queryset(self):
+        return Book.objects.all()
     def get_object(self):
         return Book.objects.get(pk=self.kwargs["book_id"])
 
