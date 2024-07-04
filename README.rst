@@ -573,7 +573,7 @@ You can customise the object either by overriding ``get_object`` or
 For more information refer to the `Django documentation`_ and the
 ``rules.contrib.views`` module.
 
-.. _Django documentation: https://docs.djangoproject.com/en/1.9/topics/auth/default/#limiting-access-to-logged-in-users
+.. _Django documentation: https://docs.djangoproject.com/en/stable/topics/auth/default/#limiting-access-to-logged-in-users
 
 Checking permission automatically based on view type
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
