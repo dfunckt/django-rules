@@ -260,12 +260,13 @@ together into a *rule set*. ``rules`` has two predefined rule sets:
     context.
 
 So, let's define our first couple of rules, adding them to the shared rule
-set. We can use the ``is_book_author`` predicate we defined earlier:
+set. We can use the ``is_book_author`` predicate we defined earlier, optionally
+adding a ``verbose_name``:
 
 .. code:: python
 
     >>> rules.add_rule('can_edit_book', is_book_author)
-    >>> rules.add_rule('can_delete_book', is_book_author)
+    >>> rules.add_rule('can_delete_book', is_book_author, verbose_name="Can Delete Book")
 
 Assuming we've got some data, we can now test our rules:
 
@@ -384,12 +385,13 @@ Creating permissions
 
 The convention for naming permissions in Django is ``app_label.action_object``,
 and we like to adhere to that. Let's add rules for the ``books.change_book``
-and ``books.delete_book`` permissions:
+and ``books.delete_book`` permissions, again, with the option to add a
+``verbose_name``:
 
 .. code:: python
 
     >>> rules.add_perm('books.change_book', is_book_author | is_editor)
-    >>> rules.add_perm('books.delete_book', is_book_author)
+    >>> rules.add_perm('books.delete_book', is_book_author, verbose_name="Books app: Delete book")
 
 See the difference in the API? ``add_perm`` adds to a permissions-specific
 rule set, whereas ``add_rule`` adds to a default shared rule set. It's
@@ -484,10 +486,26 @@ directly::
                 "read": rules.is_authenticated,
             }
 
+You can mix and match use of the optional ``verbose_name`` with your permissions by
+supplying a dictionary with the predicate using the ``pred`` key and the verbose_name
+using the ``verbose_name`` key, like so::
+
+    import rules
+    from rules.contrib.models import RulesModel
+
+    class Book(RulesModel):
+        class Meta:
+            rules_permissions = {
+                "add": rules.is_staff,
+                "read": {"pred": rules.is_authenticated, "verbose_name": "Can read this book"},
+                "delete": {"pred": rules.is_staff},
+            }
+
 This would be equivalent to the following calls::
 
     rules.add_perm("app_label.add_book", rules.is_staff)
-    rules.add_perm("app_label.read_book", rules.is_authenticated)
+    rules.add_perm("app_label.read_book", rules.is_authenticated, verbose_name= "Can read this book")
+    rules.add_perm("app_label.delete_book", rules.is_staff)
 
 There are methods in ``RulesModelMixin`` that you can overwrite in order to customize
 how a model's permissions are registered. See the documented source code for details
@@ -758,13 +776,15 @@ And manipulate them by adding, removing, querying and testing rules:
     >>> features.rule_exists('has_super_feature')
     False
     >>> is_special_user = rules.is_group_member('special')
-    >>> features.add_rule('has_super_feature', is_special_user)
+    >>> features.add_rule('has_super_feature', is_special_user, verbose_name="Has Super!")
     >>> 'has_super_feature' in features
     True
     >>> features['has_super_feature']
     <Predicate:is_group_member:special object at 0x10eeaa500>
     >>> features.test_rule('has_super_feature', adrian)
     True
+    >>> features.rule_verbose_name('has_super_feature')
+    Has Super!
     >>> features.remove_rule('has_super_feature')
 
 Note however that custom rule sets are *not available* in Django templates --
@@ -982,11 +1002,11 @@ and use a rule set any way you'd use a dict.
 Instance methods
 ++++++++++++++++
 
-``add_rule(name, predicate)``
+``add_rule(name, predicate, verbose_name=None)``
     Adds a predicate to the rule set, assigning it to the given rule name.
     Raises ``KeyError`` if another rule with that name already exists.
 
-``set_rule(name, predicate)``
+``set_rule(name, predicate, verbose_name=None)``
     Set the rule with the given name, regardless if one already exists.
 
 ``remove_rule(name)``
@@ -995,6 +1015,10 @@ Instance methods
 
 ``rule_exists(name)``
     Returns ``True`` if a rule with the given name exists, ``False`` otherwise.
+
+``rule_verbose_name(name)``
+    Returns the ``verbose_name``, if it was supplied when adding or setting
+    the rule. Defaults to ``name`` if no ``verbose_name`` was supplied.
 
 ``test_rule(name, obj=None, target=None)``
     Returns the result of calling ``predicate.test(obj, target)`` where
@@ -1074,10 +1098,10 @@ Shortcuts
 Managing the shared rule set
 ++++++++++++++++++++++++++++
 
-``add_rule(name, predicate)``
+``add_rule(name, predicate, verbose_name=None)``
     Adds a rule to the shared rule set. See ``RuleSet.add_rule``.
 
-``set_rule(name, predicate)``
+``set_rule(name, predicate, verbose_name=None)``
     Set the rule with the given name from the shared rule set. See
     ``RuleSet.set_rule``.
 
@@ -1088,6 +1112,10 @@ Managing the shared rule set
     Returns whether a rule exists in the shared rule set. See
     ``RuleSet.rule_exists``.
 
+``rule_verbose_name(name)``
+    Returns the ``verbose_name``, if it was supplied when adding or setting
+    the rule. Defaults to ``name`` if no ``verbose_name`` was supplied.
+
 ``test_rule(name, obj=None, target=None)``
     Tests the rule with the given name. See ``RuleSet.test_rule``.
 
@@ -1095,10 +1123,10 @@ Managing the shared rule set
 Managing the permissions rule set
 +++++++++++++++++++++++++++++++++
 
-``add_perm(name, predicate)``
+``add_perm(name, predicate, verbose_name=None)``
     Adds a rule to the permissions rule set. See ``RuleSet.add_rule``.
 
-``set_perm(name, predicate)``
+``set_perm(name, predicate, verbose_name=None)``
     Replace a rule from the permissions rule set. See ``RuleSet.set_rule``.
 
 ``remove_perm(name)``
@@ -1107,6 +1135,10 @@ Managing the permissions rule set
 ``perm_exists(name)``
     Returns whether a rule exists in the permissions rule set. See
     ``RuleSet.rule_exists``.
+
+``perm_verbose_name(name)``
+    Returns the ``verbose_name``, if it was supplied when adding or setting
+    the permission. Defaults to ``name`` if no ``verbose_name`` was supplied.
 
 ``has_perm(name, user=None, obj=None)``
     Tests the rule with the given name. See ``RuleSet.test_rule``.
