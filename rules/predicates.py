@@ -253,7 +253,10 @@ def predicate(fn=None, name=None, **options):
         ...     if self.context.args:
         ...         return user == book.author
     """
-    if not name and not callable(fn):
+    
+    if type(fn) is dict:
+        fn = fn['pred']
+    elif not name and not callable(fn):
         name = fn
         fn = None
 

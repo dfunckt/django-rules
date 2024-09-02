@@ -9,7 +9,9 @@ import rules
 class RulesModelTests(TestCase):
     def test_preprocess(self):
         self.assertTrue(rules.perm_exists("testapp.add_testmodel"))
+        self.assertTrue(rules.perm_exists("testapp.view_testmodel"))
         self.assertTrue(rules.perm_exists("testapp.custom_testmodel"))
+        self.assertTrue(rules.perm_exists("testapp.custom2_testmodel"))
 
     def test_invalid_config(self):
         from rules.contrib.models import RulesModel
