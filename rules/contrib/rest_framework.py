@@ -1,4 +1,4 @@
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import ImproperlyConfigured
 
 
 class AutoPermissionViewSetMixin:
@@ -72,4 +72,4 @@ class AutoPermissionViewSetMixin:
         # Finally, check permission
         perm = self.get_queryset().model.get_perm(perm_type)
         if not self.request.user.has_perm(perm, obj):
-            raise PermissionDenied
+            self.permission_denied(self.request)
