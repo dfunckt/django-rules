@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## Unreleased
+
+- Add support for Django 5.1
+
 ## v3.4.0 - 2024/05/18
 
 - Add support for Django 4.2 and 5.0
