@@ -85,7 +85,7 @@ Table of Contents
 Requirements
 ============
 
-``rules`` requires Python 3.8 or newer. The last version to support Python 2.7
+``rules`` requires Python 3.9 or newer. The last version to support Python 2.7
 is ``rules`` 2.2. It can optionally integrate with Django, in which case
 requires Django 3.2 or newer.
 

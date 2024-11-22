@@ -5,6 +5,8 @@ Changelog
 
 *Add a sentence for each interesting change in this section.*
 
+- Drop support for EOL Python 3.8
+
 -------
 
 ## v3.5.0 - 2024/09/02
