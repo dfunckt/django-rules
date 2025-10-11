@@ -1,7 +1,9 @@
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 
+from ..viewsets import BaseAutoPermissionMixin
 
-class AutoPermissionViewSetMixin:
+
+class AutoPermissionViewSetMixin(BaseAutoPermissionMixin):
     """
     Enforces object-level permissions in ``rest_framework.viewsets.ViewSet``,
     deriving the permission type from the particular action to be performed..
@@ -59,6 +61,10 @@ class AutoPermissionViewSetMixin:
             # Skip permission checking for this action
             return
 
+        if self.action == "create":
+            # Will be checked before perform_create
+            return
+
         # Determine whether we've to check object permissions (for detail actions)
         obj = None
         extra_actions = self.get_extra_actions()
@@ -66,10 +72,18 @@ class AutoPermissionViewSetMixin:
         if handler.__func__ in extra_actions:
             if handler.detail:
                 obj = self.get_object()
-        elif self.action not in ("create", "list"):
+        elif self.action not in ("list"):
             obj = self.get_object()
 
         # Finally, check permission
-        perm = self.get_queryset().model.get_perm(perm_type)
+        model = self.get_queryset().model
+        perm = self.get_permission_for_model(model, perm_type)
         if not self.request.user.has_perm(perm, obj):
             raise PermissionDenied
+
+    def perform_create(self, serializer):
+        model = self.get_queryset().model
+        perm = self.get_permission_for_model(model, "add")
+        if not self.request.user.has_perm(perm, serializer.validated_data):
+            raise PermissionDenied
+        return super().perform_create(serializer)
