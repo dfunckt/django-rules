@@ -1,7 +1,9 @@
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 
+from ..viewsets import BaseAutoPermissionMixin
 
-class AutoPermissionViewSetMixin:
+
+class AutoPermissionViewSetMixin(BaseAutoPermissionMixin):
     """
     Enforces object-level permissions in ``rest_framework.viewsets.ViewSet``,
     deriving the permission type from the particular action to be performed..
@@ -70,6 +72,7 @@ class AutoPermissionViewSetMixin:
             obj = self.get_object()
 
         # Finally, check permission
-        perm = self.get_queryset().model.get_perm(perm_type)
+        model = self.get_queryset().model
+        perm = self.get_permission_for_model(model, perm_type)
         if not self.request.user.has_perm(perm, obj):
             raise PermissionDenied
