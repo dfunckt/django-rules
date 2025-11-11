@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from asgiref.sync import sync_to_async
+
 from rules.permissions import (
     ObjectPermissionBackend,
     add_perm,
@@ -50,3 +52,17 @@ class PermissionsTests(TestCase):
         assert not backend.has_perm(None, "can_edit_book")
         remove_perm("can_edit_book")
         assert not perm_exists("can_edit_book")
+
+    async def test_backend_async(self):
+        backend = ObjectPermissionBackend()
+
+        await sync_to_async(add_perm)("can_edit_book", always_true)
+        assert "can_edit_book" in permissions
+        assert await backend.ahas_perm(None, "can_edit_book")
+        assert await backend.ahas_module_perms(None, "can_edit_book")
+        with self.assertRaises(KeyError):
+            await sync_to_async(add_perm)("can_edit_book", always_true)
+        await sync_to_async(set_perm)("can_edit_book", always_false)
+        assert not await backend.ahas_perm(None, "can_edit_book")
+        await sync_to_async(remove_perm)("can_edit_book")
+        assert not await sync_to_async(perm_exists)("can_edit_book")
